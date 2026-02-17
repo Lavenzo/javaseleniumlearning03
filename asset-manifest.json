@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/javaseleniumlearning03/static/css/main.e6c13ad2.css",
+    "main.js": "/javaseleniumlearning03/static/js/main.8cba957d.js",
+    "static/js/453.3b5ad83c.chunk.js": "/javaseleniumlearning03/static/js/453.3b5ad83c.chunk.js",
+    "index.html": "/javaseleniumlearning03/index.html",
+    "main.e6c13ad2.css.map": "/javaseleniumlearning03/static/css/main.e6c13ad2.css.map",
+    "main.8cba957d.js.map": "/javaseleniumlearning03/static/js/main.8cba957d.js.map",
+    "453.3b5ad83c.chunk.js.map": "/javaseleniumlearning03/static/js/453.3b5ad83c.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.e6c13ad2.css",
+    "static/js/main.8cba957d.js"
+  ]
+}
