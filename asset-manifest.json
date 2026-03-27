@@ -1,15 +1,17 @@
 {
   "files": {
     "main.css": "/javaseleniumlearning03/static/css/main.e6c13ad2.css",
-    "main.js": "/javaseleniumlearning03/static/js/main.a4671011.js",
+    "main.js": "/javaseleniumlearning03/static/js/main.ce0971d9.js",
     "static/js/453.3b5ad83c.chunk.js": "/javaseleniumlearning03/static/js/453.3b5ad83c.chunk.js",
+    "static/media/Project01b.png": "/javaseleniumlearning03/static/media/Project01b.7862c71a7b1f5a433898.png",
+    "static/media/Project01a.png": "/javaseleniumlearning03/static/media/Project01a.9e0ae3cc50331f1e097e.png",
     "index.html": "/javaseleniumlearning03/index.html",
     "main.e6c13ad2.css.map": "/javaseleniumlearning03/static/css/main.e6c13ad2.css.map",
-    "main.a4671011.js.map": "/javaseleniumlearning03/static/js/main.a4671011.js.map",
+    "main.ce0971d9.js.map": "/javaseleniumlearning03/static/js/main.ce0971d9.js.map",
     "453.3b5ad83c.chunk.js.map": "/javaseleniumlearning03/static/js/453.3b5ad83c.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.e6c13ad2.css",
-    "static/js/main.a4671011.js"
+    "static/js/main.ce0971d9.js"
   ]
 }
