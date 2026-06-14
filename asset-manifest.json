@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/javaseleniumlearning03/static/css/main.e6c13ad2.css",
-    "main.js": "/javaseleniumlearning03/static/js/main.003da9dc.js",
+    "main.js": "/javaseleniumlearning03/static/js/main.a3a9c141.js",
     "static/js/453.3b5ad83c.chunk.js": "/javaseleniumlearning03/static/js/453.3b5ad83c.chunk.js",
     "static/media/Project01a.png": "/javaseleniumlearning03/static/media/Project01a.93c841170b42ee2f892f.png",
     "static/media/Project02a.png": "/javaseleniumlearning03/static/media/Project02a.4d86f20aad94dcf54f5b.png",
@@ -11,11 +11,11 @@
     "static/media/Project02d.png": "/javaseleniumlearning03/static/media/Project02d.3465e97b65f96fc4cbc3.png",
     "index.html": "/javaseleniumlearning03/index.html",
     "main.e6c13ad2.css.map": "/javaseleniumlearning03/static/css/main.e6c13ad2.css.map",
-    "main.003da9dc.js.map": "/javaseleniumlearning03/static/js/main.003da9dc.js.map",
+    "main.a3a9c141.js.map": "/javaseleniumlearning03/static/js/main.a3a9c141.js.map",
     "453.3b5ad83c.chunk.js.map": "/javaseleniumlearning03/static/js/453.3b5ad83c.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.e6c13ad2.css",
-    "static/js/main.003da9dc.js"
+    "static/js/main.a3a9c141.js"
   ]
 }
