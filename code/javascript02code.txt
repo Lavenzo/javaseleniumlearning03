@@ -1,0 +1,4636 @@
+// Helper Class
+
+const { test, expect } = require("@playwright/test");
+
+// raw data
+let user_list = [
+  "Yuna",
+  "Linda",
+  "Mike",
+  "乐乐",
+  "凯凯",
+  "James",
+  "Emma",
+  "Sophia",
+  "浩然",
+  "子轩",
+  "雨桐",
+  "William",
+  "Olivia",
+  "一诺",
+  "明宇",
+  "Lucas",
+  "Mia",
+  "星辰",
+  "Ethan",
+  "欣怡",
+];
+
+//class file
+
+class Project02_HelperClass_pt01 {
+  constructor(page) {
+    this.page = page;
+  }
+  async navigate() {
+    await this.page.goto("https://taqelah.sg/automation-testing-practice.html");
+  }
+  async validateWebsiteTitle(title) {
+    await expect(this.page).toHaveTitle(title);
+  }
+  async tc002(headerLocator, expectedResult) {
+    let headerText = await headerLocator.textContent();
+    await test.step(`Step 2: Actual Header Text = ${headerText}`, async () => {
+      await expect(headerText).toBe(expectedResult);
+    });
+  }
+  async tc003_getExpectedArrayFieldLabel(fieldLocator, stepNum = 2) {
+    let extractedInputFields = fieldLocator.split(/\s+/);
+    await test.info().attach(`Step ${stepNum}: Extracted Field Label Array`, {
+      body: JSON.stringify(extractedInputFields, null, 2),
+      contentType: "application/json",
+    });
+    return extractedInputFields;
+  }
+  tc003_getNormalisedExpectedFieldLabel(extractedFieldsArray, arrayLocator) {
+    let expectedNormalisedField = extractedFieldsArray[arrayLocator];
+    return expectedNormalisedField;
+  }
+  async tc003_getExtractedFieldLabel(fieldLocator) {
+    fieldLocator = await fieldLocator.textContent();
+    fieldLocator = fieldLocator.trim();
+    return fieldLocator;
+  }
+  async tc003_fieldValidation(
+    expectedResult,
+    actualResult,
+    fieldLabel,
+    stepNum,
+  ) {
+    await test.step(`Step ${stepNum}: Verify ${fieldLabel} Label Matches: ${expectedResult} === ${actualResult}`, async () => {
+      await expect(expectedResult).toBe(actualResult);
+    });
+  }
+  genNum(min, max) {
+    let randNum = Math.floor(Math.random() * (max - min + 1)) + min;
+    return randNum;
+  }
+  getUserName(idx) {
+    return user_list[idx];
+  }
+  async tc004_fillUserName(user, userNameFieldLocator, testStep) {
+    await test.step(`Step ${testStep}: Fill up the Username field`, async () => {
+      await userNameFieldLocator.click();
+      await userNameFieldLocator.fill(user);
+    });
+  }
+  async tc005_fillUserEmail(userEmail, userEmailLocator, testStep) {
+    await test.step(`Step ${testStep}: Fill up the Email field`, async () => {
+      await userEmailLocator.click();
+      await userEmailLocator.fill(userEmail);
+    });
+  }
+  async tc006_fillUserPwd(pwd, userPwdLocator, testStep) {
+    await test.step(`Step ${testStep}: Fill up the Email field`, async () => {
+      await userPwdLocator.click();
+      await userPwdLocator.fill(pwd);
+    });
+  }
+  async tc007_fillUserAge(age, userAgeLocator, testStep) {
+    await test.step(`Step ${testStep}: Fill up the Age field`, async () => {
+      await userAgeLocator.click();
+      await userAgeLocator.fill(age);
+    });
+  }
+  tc008_getDateOfBirth(age) {
+    let month = this.genNum(1, 12);
+    let day;
+    if (month === 4 || month === 6 || month === 9 || month === 11) {
+      day = this.genNum(1, 30);
+    } else if (month === 2) {
+      day = this.genNum(1, 28);
+    } else {
+      day = this.genNum(1, 31);
+    }
+    let year = new Date().getFullYear();
+    year = year - Number(age);
+    month = String(month).padStart(2, "0");
+    day = String(day).padStart(2, "0");
+    let dateOfBirth = `${year}-${month}-${day}`;
+    return dateOfBirth;
+  }
+  async tc008_fillUserDateOfBirth(dateOfBirth, userDOBLocator, testStep) {
+    await test.step(`Step ${testStep}: Fill up the Age field`, async () => {
+      await userDOBLocator.click();
+      await userDOBLocator.fill(dateOfBirth);
+    });
+  }
+  async tc009_fillUserComments(comments, userCommentsLocator, testStep) {
+    await test.step(`Step ${testStep}: Fill up the Age field`, async () => {
+      await userCommentsLocator.click();
+      await userCommentsLocator.fill(comments);
+    });
+  }
+}
+
+module.exports = Project02_HelperClass_pt01;
+
+const { test, expect } = require("@playwright/test");
+
+class Project02_HelperClass_pt02 {
+  constructor(page) {
+    this.page = page;
+  }
+  async navigate() {
+    await this.page.goto("https://taqelah.sg/automation-testing-practice.html");
+  }
+  async scrollToSection(locator, testStep) {
+    await test.step(`Step ${testStep}`, async () => {
+      await locator.scrollIntoViewIfNeeded();
+    });
+  }
+  async tc10_validateSection2Header(headerLocator, expectedResult) {
+    let headerText = await headerLocator.textContent();
+    await test.step(`Step 3: Actual Header Text = ${headerText}`, async () => {
+      await expect(headerText).toBe(expectedResult);
+    });
+  }
+  async tc11_validateTimeStamp(btn, x, y) {
+    await test.step(`Step 3: User clicks on the "${btn}" button`, async () => {
+      await this.page.getByTestId("btn-click").click();
+    });
+
+    let timeStampChecker = await this.page
+      .getByTestId("output-display")
+      .textContent();
+    timeStampChecker = timeStampChecker.trim();
+    await test.step(`Step 4: Output Result: ${timeStampChecker}`, async () => {
+      await expect(timeStampChecker).toContain(x);
+      await expect(timeStampChecker).toContain(y);
+    });
+    timeStampChecker = timeStampChecker.replace(x + " " + y, "").trim();
+    await test.step(`Step 5: Extracted Timestamp = ${timeStampChecker}`, async () => {});
+    let clickTime = new Date();
+    let clickDate = clickTime.toDateString();
+
+    let clickTimestamp = new Date(`${clickDate} ${timeStampChecker}`);
+    let currentTimestamp = new Date();
+
+    let difference = Math.abs((currentTimestamp - clickTimestamp) / 1000);
+    await test.step(`Step 6: Verify the Expected Result and Timestamp captured to be within 5 seconds`, async () => {
+      expect(difference).toBeLessThanOrEqual(5);
+    });
+  }
+  async tc12_validateTimeStamp(btn, x, y) {
+    await test.step(`Step 3: User double-clicks on the "${btn}" button`, async () => {
+      await this.page.getByTestId("btn-double-click").dblclick();
+    });
+
+    let timeStampChecker = await this.page
+      .getByTestId("output-display")
+      .textContent();
+    timeStampChecker = timeStampChecker.trim();
+    await test.step(`Step 4: Output Result: ${timeStampChecker}`, async () => {
+      await expect(timeStampChecker).toContain(x);
+      await expect(timeStampChecker).toContain(y);
+    });
+    timeStampChecker = timeStampChecker.replace(x + " " + y, "").trim();
+    await test.step(`Step 5: Extracted Timestamp = ${timeStampChecker}`, async () => {});
+    let clickTime = new Date();
+    let clickDate = clickTime.toDateString();
+
+    let clickTimestamp = new Date(`${clickDate} ${timeStampChecker}`);
+    let currentTimestamp = new Date();
+
+    let difference = Math.abs((currentTimestamp - clickTimestamp) / 1000);
+    await test.step(`Step 6: Verify the Expected Result and Timestamp captured to be within 5 seconds`, async () => {
+      expect(difference).toBeLessThanOrEqual(5);
+    });
+  }
+  async tc13_validateTimeStamp(btn, x, y) {
+    await test.step(`Step 3: User right-clicks on the "${btn}" button`, async () => {
+      await this.page.getByTestId("btn-right-click").click({ button: "right" });
+    });
+
+    let timeStampChecker = await this.page
+      .getByTestId("output-display")
+      .textContent();
+    timeStampChecker = timeStampChecker.trim();
+    await test.step(`Step 4: Output Result: ${timeStampChecker}`, async () => {
+      await expect(timeStampChecker).toContain(x);
+      await expect(timeStampChecker).toContain(y);
+    });
+    timeStampChecker = timeStampChecker.replace(x + " " + y, "").trim();
+    await test.step(`Step 5: Extracted Timestamp = ${timeStampChecker}`, async () => {});
+    let clickTime = new Date();
+    let clickDate = clickTime.toDateString();
+
+    let clickTimestamp = new Date(`${clickDate} ${timeStampChecker}`);
+    let currentTimestamp = new Date();
+
+    let difference = Math.abs((currentTimestamp - clickTimestamp) / 1000);
+    await test.step(`Step 6: Verify the Expected Result and Timestamp captured to be within 5 seconds`, async () => {
+      expect(difference).toBeLessThanOrEqual(5);
+    });
+  }
+}
+
+module.exports = Project02_HelperClass_pt02;
+
+const { test, expect } = require("@playwright/test");
+
+class Project02_HelperClass_pt03 {
+  constructor(page) {
+    this.page = page;
+  }
+  async navigate() {
+    await this.page.goto("https://taqelah.sg/automation-testing-practice.html");
+  }
+  async scrollToSection(locator, testStep) {
+    await test.step(`Step ${testStep}`, async () => {
+      await locator.scrollIntoViewIfNeeded();
+    });
+  }
+  genNum(min, max) {
+    let randNum = Math.floor(Math.random() * (max - min + 1)) + min;
+    return randNum;
+  }
+  async tc14_validateSection3Header(headerLocator, expectedResult) {
+    let headerText = await headerLocator.textContent();
+    await test.step(`Step 3: Actual Header Text = ${headerText}`, async () => {
+      await expect(headerText).toBe(expectedResult);
+    });
+  }
+  async tc15_validateSubLabelsSection3(
+    expectedResultLocator,
+    actualResultLocator,
+  ) {
+    let expectedResult;
+    let actualResult;
+    let actualLabel;
+
+    await test.step(`Step 3: Normalise and get the expected result`, async () => {
+      expectedResult = expectedResultLocator.trim();
+    });
+
+    await test.step(`Step 4: Normalise and get the actual result`, async () => {
+      actualResult = actualResultLocator.trim();
+
+      let radioButtonArray = actualResult.split(/\s+/);
+
+      await test.info().attach("Radio Button Section Array", {
+        body: JSON.stringify(radioButtonArray, null, 2),
+        contentType: "application/json",
+      });
+
+      actualLabel = radioButtonArray[3] + " " + radioButtonArray[4];
+    });
+
+    await test.step(`Step 5: Compare the Expected Result: "${expectedResult}" against the Actual Result: "${actualLabel}"`, async () => {
+      expect(expectedResult).toBe(actualLabel);
+    });
+  }
+  async tc16_validateSubLabelsSection3(
+    expectedResultLocator,
+    actualResultLocator,
+  ) {
+    let expectedResult;
+    let actualResult;
+    let actualLabel;
+
+    await test.step(`Step 3: Normalise and get the expected result`, async () => {
+      expectedResult = expectedResultLocator.trim();
+    });
+
+    await test.step(`Step 4: Normalise and get the actual result`, async () => {
+      actualResult = actualResultLocator.trim();
+
+      let radioButtonArray = actualResult.split(/\s+/);
+
+      await test.info().attach("Radio Button Section Array", {
+        body: JSON.stringify(radioButtonArray, null, 2),
+        contentType: "application/json",
+      });
+
+      actualLabel = radioButtonArray[8] + " " + radioButtonArray[9];
+    });
+
+    await test.step(`Step 5: Compare the Expected Result: "${expectedResult}" against the Actual Result: "${actualLabel}"`, async () => {
+      expect(expectedResult).toBe(actualLabel);
+    });
+  }
+  async checkRadioButton(radioButtonLocator, stepTestLabel) {
+    await test.step(`Step 3: Select Gender = ${stepTestLabel}`, async () => {
+      await radioButtonLocator.check();
+    });
+
+    await test.step(`Step 4: Verify Gender = ${stepTestLabel} is selected`, async () => {
+      await expect(radioButtonLocator).toBeChecked();
+    });
+  }
+  async checkRadioButton2(expRadioBtnLocator, stepTestLabel) {
+    await test.step(`Step 5: Select Experience Level = ${stepTestLabel}`, async () => {
+      await expRadioBtnLocator.check();
+    });
+    await test.step(`Step 6: Verify Experience Level = ${stepTestLabel} is selected`, async () => {
+      await expect(expRadioBtnLocator).toBeChecked();
+    });
+  }
+}
+
+module.exports = Project02_HelperClass_pt03;
+
+const { test, expect } = require("@playwright/test");
+
+class Project02_HelperClass_pt04 {
+  constructor(page) {
+    this.page = page;
+  }
+  async navigate() {
+    await this.page.goto("https://taqelah.sg/automation-testing-practice.html");
+  }
+  async scrollToSection(locator, testStep) {
+    await test.step(`Step ${testStep}`, async () => {
+      await locator.scrollIntoViewIfNeeded();
+    });
+  }
+  genNum(min, max) {
+    let randNum = Math.floor(Math.random() * (max - min + 1)) + min;
+    return randNum;
+  }
+  async tc25_validateSection4Header(headerLocator, expectedResult) {
+    let headerText = await headerLocator.textContent();
+    await test.step(`Step 3: Actual Header Text = ${headerText}`, async () => {
+      await expect(headerText).toBe(expectedResult);
+    });
+  }
+  async tc26_validateSection4SubHeader(
+    expectedResultLocator,
+    actualResultLocator,
+  ) {
+    let expectedResult;
+    let actualResult;
+    expectedResult = await expectedResultLocator.textContent();
+    expectedResult = expectedResult.trim();
+    actualResult = await actualResultLocator.textContent();
+    actualResult = actualResult.trim();
+
+    let checkboxArray = actualResult.split(/\s+/);
+
+    await test.info().attach("Checkbox Section Array", {
+      body: JSON.stringify(checkboxArray, null, 2),
+      contentType: "application/json",
+    });
+    await test.step(`Step 4: Checkbox Array = ${JSON.stringify(checkboxArray)}`, async () => {});
+
+    let actualLabel =
+      checkboxArray[2] + " " + checkboxArray[3] + " " + checkboxArray[4];
+    await test.step(`Step 5: Actual extracted label after normalisation = ${actualLabel}`, async () => {});
+
+    await test.step(`Step 6: Compare Expected Result: "${expectedResult}" against Actual Result: "${actualLabel}"`, async () => {
+      expect(expectedResult).toBe(actualLabel);
+    });
+  }
+  async tc27_validateSection4SubHeader(
+    expectedResultLocator,
+    actualResultLocator,
+  ) {
+    let expectedResult;
+    let actualResult;
+    expectedResult = await expectedResultLocator.textContent();
+    expectedResult = expectedResult.trim();
+    actualResult = await actualResultLocator.textContent();
+    actualResult = actualResult.trim();
+
+    let checkboxArray = actualResult.split(/\s+/);
+
+    await test.info().attach("Checkbox Section Array", {
+      body: JSON.stringify(checkboxArray, null, 2),
+      contentType: "application/json",
+    });
+    await test.step(`Step 4: Checkbox Array = ${JSON.stringify(checkboxArray)}`, async () => {});
+
+    let actualLabel =
+      checkboxArray[9] +
+      " " +
+      checkboxArray[10] +
+      " " +
+      checkboxArray[11] +
+      " " +
+      checkboxArray[12] +
+      " " +
+      checkboxArray[13] +
+      " " +
+      checkboxArray[14];
+    await test.step(`Step 5: Actual extracted label after normalisation = ${actualLabel}`, async () => {});
+
+    await test.step(`Step 6: Compare Expected Result: "${expectedResult}" against Actual Result: "${actualLabel}"`, async () => {
+      expect(expectedResult).toBe(actualLabel);
+    });
+  }
+  async selectCheckBox(checkboxLocator, programmingLanguage) {
+    await test.step(`Step 4: Select Programming Language = ${programmingLanguage}`, async () => {
+      await checkboxLocator.check();
+    });
+
+    await test.step(`Step 5: Verify Programming Language = ${programmingLanguage} is selected`, async () => {
+      await expect(checkboxLocator).toBeChecked();
+    });
+  }
+  async selectCheckBox2(checkboxLocator, item) {
+    await test.step(`Step 10: Select Checkbox = ${item}`, async () => {
+      await checkboxLocator.check();
+    });
+
+    await test.step(`Step 11: Verify Checkbox = ${item} is selected`, async () => {
+      await expect(checkboxLocator).toBeChecked();
+    });
+  }
+  async tc35_selectAllCheckBoxes() {
+    let checkAllBtn = this.page.getByTestId("btn-check-all");
+    await test.step(`Step 4: Click Check All Languages button`, async () => {
+      await checkAllBtn.click();
+    });
+
+    let javascriptChkBox = this.page.getByTestId("checkbox-javascript");
+    let pythonChkBox = this.page.getByTestId("checkbox-python");
+    let javaChkBox = this.page.getByTestId("checkbox-java");
+    let cSharpChkBox = this.page.getByTestId("checkbox-csharp");
+
+    await test.step(`Step 5: Verify all programming language checkboxes are selected`, async () => {
+      await expect(javascriptChkBox).toBeChecked();
+      await expect(pythonChkBox).toBeChecked();
+      await expect(javaChkBox).toBeChecked();
+      await expect(cSharpChkBox).toBeChecked();
+    });
+  }
+  async tc36_unselectAllCheckBoxes() {
+    let uncheckAllBtn = this.page.getByTestId("btn-uncheck-all");
+
+    await test.step(`Step 6: Click Uncheck All Languages button`, async () => {
+      await uncheckAllBtn.click();
+    });
+
+    let javascriptChkBox = this.page.getByTestId("checkbox-javascript");
+    let pythonChkBox = this.page.getByTestId("checkbox-python");
+    let javaChkBox = this.page.getByTestId("checkbox-java");
+    let cSharpChkBox = this.page.getByTestId("checkbox-csharp");
+
+    await test.step(`Step 7: Verify all programming language checkboxes are unselected`, async () => {
+      await expect(javascriptChkBox).not.toBeChecked();
+      await expect(pythonChkBox).not.toBeChecked();
+      await expect(javaChkBox).not.toBeChecked();
+      await expect(cSharpChkBox).not.toBeChecked();
+    });
+  }
+}
+
+module.exports = Project02_HelperClass_pt04;
+
+const { test, expect } = require("@playwright/test");
+
+class Project02_HelperClass_pt05 {
+  constructor(page) {
+    this.page = page;
+  }
+  async navigate() {
+    await this.page.goto("https://taqelah.sg/automation-testing-practice.html");
+  }
+  async scrollToSection(locator, testStep) {
+    await test.step(`Step ${testStep}`, async () => {
+      await locator.scrollIntoViewIfNeeded();
+    });
+  }
+  genNum(min, max) {
+    let randNum = Math.floor(Math.random() * (max - min + 1)) + min;
+    return randNum;
+  }
+  async tc37_validateSection5Header(headerLocator, expectedResult) {
+    let headerText = await headerLocator.textContent();
+    await test.step(`Step 3: Actual Header Text = ${headerText}`, async () => {
+      await expect(headerText).toBe(expectedResult);
+    });
+  }
+  async tc38_validateSection5Header(
+    expectedResultLocator,
+    actualResultLocator,
+  ) {
+    let expectedResult = await expectedResultLocator.textContent();
+    expectedResult = expectedResult.trim();
+
+    let actualResult = await actualResultLocator.textContent();
+    actualResult = actualResult.trim();
+
+    let dropdownArray = actualResult.split(/\s+/);
+
+    await test.info().attach("Static Dropdown Array", {
+      body: JSON.stringify(dropdownArray, null, 2),
+      contentType: "application/json",
+    });
+
+    let actualLabel = dropdownArray[5] + " " + dropdownArray[6];
+
+    await test.step(`Step 4: Compare Expected Result: "${expectedResult}" against Actual Result: "${actualLabel}"`, async () => {
+      expect(expectedResult).toBe(actualLabel);
+    });
+  }
+  async tc39_checkItemsInStaticDropdown() {
+    let expectedCountries = [
+      "-- Select Country --",
+      "United States",
+      "United Kingdom",
+      "Canada",
+      "Australia",
+      "India",
+      "Germany",
+      "France",
+    ];
+
+    let countryDropdown = await this.page.getByTestId("select-country");
+    let actualCountries = await countryDropdown
+      .locator("option")
+      .allTextContents();
+    await test.info().attach("Country Dropdown Options", {
+      body: JSON.stringify(actualCountries, null, 2),
+      contentType: "application/json",
+    });
+
+    await test.step(`Step 3: Verify total number of dropdown options`, async () => {
+      expect(actualCountries.length).toBe(8);
+    });
+
+    await test.step(`Step 4: Verify dropdown contents match expected values`, async () => {
+      expect(actualCountries).toEqual(expectedCountries);
+    });
+  }
+  async selectStaticDropDownValue(
+    countryDropdownLocator,
+    dropdownValue,
+    testStepLabel,
+  ) {
+    await test.step(`Step 4: Select the country selection = "${testStepLabel}" from the static Dropdown`, async () => {
+      await countryDropdownLocator.selectOption(dropdownValue);
+    });
+
+    await test.step(`Step 5: Verify the selected country value is "${dropdownValue}"`, async () => {
+      await expect(countryDropdownLocator).toHaveValue(dropdownValue);
+    });
+  }
+}
+
+module.exports = Project02_HelperClass_pt05;
+
+const { test, expect } = require("@playwright/test");
+
+class Project02_HelperClass_pt06 {
+  constructor(page) {
+    this.page = page;
+  }
+  async navigate() {
+    await this.page.goto("https://taqelah.sg/automation-testing-practice.html");
+  }
+  async scrollToSection(locator, testStep) {
+    await test.step(`Step ${testStep}`, async () => {
+      await locator.scrollIntoViewIfNeeded();
+    });
+  }
+  genNum(min, max) {
+    let randNum = Math.floor(Math.random() * (max - min + 1)) + min;
+    return randNum;
+  }
+  async tc48_validateSection5Header(headerLocator, expectedResult) {
+    let headerText = await headerLocator.textContent();
+    await test.step(`Step 3: Actual Header Text = ${headerText}`, async () => {
+      await expect(headerText).toBe(expectedResult);
+    });
+  }
+  async validateSubHeader(subHeaderLocator, expectedResult) {
+    await test.step(`Step 4: Validate Sub Field Header: "${expectedResult}"`, async () => {
+      let subHeaderText = await subHeaderLocator.textContent();
+      await expect(subHeaderText).toBe(expectedResult);
+    });
+  }
+  async validateDropDownItemsCount(dropdownLocator, totalItems) {
+    await test.step(`Step 4: Extract dropdown items and attach JSON`, async () => {
+      const allOptions = await dropdownLocator.allTextContents();
+      const dropdownData = { dropdown: "Select Category", values: allOptions };
+      await test.info().attach("Dropdown Items", {
+        body: JSON.stringify(dropdownData, null, 2),
+        contentType: "application/json",
+      });
+    });
+    await test.step(`Step 5: Verify number of items in Select Category dropdown`, async () => {
+      const optionCount = await dropdownLocator.count();
+      await expect(optionCount).toBe(totalItems);
+    });
+  }
+  async validateDropDownSubCategoryItemsCount(
+    categoryItem,
+    optionValue,
+    expectedNumItems,
+  ) {
+    await test.step(`Step 4: Select Category = "${categoryItem}"`, async () => {
+      await this.page.selectOption("#category-select", `${optionValue}`);
+    });
+
+    let subDropdownOptions = await this.page.locator(
+      "#subcategory-select option",
+    );
+
+    await test.step(`Step 5: Extract subcategory items and attach JSON`, async () => {
+      const allSubOptions = await subDropdownOptions.allTextContents();
+
+      const dropdownData = {
+        category: `${categoryItem}`,
+        subcategoryValues: allSubOptions,
+      };
+      await test.info().attach("Subcategory Dropdown Items", {
+        body: JSON.stringify(dropdownData, null, 2),
+        contentType: "application/json",
+      });
+    });
+    await test.step(`Step 6: Verify number of subcategory items = "${expectedNumItems}"`, async () => {
+      const optionCount = await subDropdownOptions.count();
+      await expect(optionCount).toBe(expectedNumItems);
+    });
+  }
+  async categoryElectronics_subCategorySelection(
+    subCategorySelection,
+    optionValue,
+  ) {
+    await test.step(`Step 4: Select Category = "Electronics"`, async () => {
+      await this.page.selectOption("#category-select", "electronics");
+    });
+
+    await test.step(`Step 5: Select Subcategory = "${subCategorySelection}"`, async () => {
+      await this.page.selectOption("#subcategory-select", `${optionValue}`);
+    });
+
+    await test.step(`Step 6: Verify selected subcategory = "${subCategorySelection}"`, async () => {
+      const selectedValue = await this.page
+        .locator("#subcategory-select")
+        .inputValue();
+      await expect(selectedValue).toBe(`${optionValue}`);
+    });
+  }
+  async categoryClothing_subCategorySelection(
+    subCategorySelection,
+    optionValue,
+  ) {
+    await test.step(`Step 4: Select Category = "Clothing"`, async () => {
+      await this.page.selectOption("#category-select", "clothing");
+    });
+
+    await test.step(`Step 5: Select Subcategory = "${subCategorySelection}"`, async () => {
+      await this.page.selectOption("#subcategory-select", `${optionValue}`);
+    });
+
+    await test.step(`Step 6: Verify selected subcategory = "${subCategorySelection}"`, async () => {
+      const selectedValue = await this.page
+        .locator("#subcategory-select")
+        .inputValue();
+      await expect(selectedValue).toBe(`${optionValue}`);
+    });
+  }
+  async categoryBooks_subCategorySelection(subCategorySelection, optionValue) {
+    await test.step(`Step 4: Select Category = "Books"`, async () => {
+      await this.page.selectOption("#category-select", "books");
+    });
+
+    await test.step(`Step 5: Select Subcategory = "${subCategorySelection}"`, async () => {
+      await this.page.selectOption("#subcategory-select", `${optionValue}`);
+    });
+
+    await test.step(`Step 6: Verify selected subcategory = "${subCategorySelection}"`, async () => {
+      const selectedValue = await this.page
+        .locator("#subcategory-select")
+        .inputValue();
+      await expect(selectedValue).toBe(`${optionValue}`);
+    });
+  }
+}
+
+module.exports = Project02_HelperClass_pt06;
+
+
+const { test, expect } = require("@playwright/test");
+
+class Project02_HelperClass_pt07 {
+  constructor(page) {
+    this.page = page;
+  }
+  async navigate() {
+    await this.page.goto("https://taqelah.sg/automation-testing-practice.html");
+  }
+  async scrollToSection(locator, testStep) {
+    await test.step(`Step ${testStep}`, async () => {
+      await locator.scrollIntoViewIfNeeded();
+    });
+  }
+  genNum(min, max) {
+    let randNum = Math.floor(Math.random() * (max - min + 1)) + min;
+    return randNum;
+  }
+  async selectMultiDropdownValue(
+    optionLocator,
+    optionLabel,
+    optionValue,
+    optionIndex,
+  ) {
+    let optionDataArray;
+
+    await test.step(`Step 3: Extract all skill options and attach JSON`, async () => {
+      const count = await optionLocator.count();
+
+      optionDataArray = [];
+
+      for (let i = 0; i < count; i++) {
+        const value = await optionLocator.nth(i).getAttribute("value");
+        const text = await optionLocator.nth(i).textContent();
+
+        optionDataArray.push({
+          index: i,
+          value: value,
+          text: text.trim(),
+        });
+      }
+
+      await test.info().attach("Skills Dropdown Data", {
+        body: JSON.stringify(optionDataArray, null, 2),
+        contentType: "application/json",
+      });
+    });
+
+    await test.step(`Step 4: Validate ${optionLabel} is at index 0`, async () => {
+      const firstOption = optionDataArray[optionIndex];
+
+      await expect(firstOption.value).toBe(optionValue);
+      await expect(firstOption.text).toBe(optionLabel);
+    });
+
+    await test.step(`Step 5: Select option using index`, async () => {
+      await this.page.selectOption("#skills-select", { index: optionIndex });
+    });
+    await test.step(`Step 6: Verify selected value maps to correct text`, async () => {
+      const selectedOption = this.page.locator("#skills-select option:checked");
+
+      const selectedValue = await selectedOption.getAttribute("value");
+      const selectedText = (await selectedOption.textContent()).trim();
+
+      await expect(selectedValue).toBe(optionValue);
+      await expect(selectedText).toBe(optionLabel);
+    });
+  }
+
+  async extractOptionData(optionLocator) {
+    const optionDataArray = [];
+    const count = await optionLocator.count();
+
+    for (let i = 0; i < count; i++) {
+      const value = await optionLocator.nth(i).getAttribute("value");
+      const text = await optionLocator.nth(i).textContent();
+
+      optionDataArray.push({
+        index: i,
+        value: value,
+        text: text.trim(),
+      });
+    }
+
+    return optionDataArray;
+  }
+
+  async attachOptionData(optionDataArray) {
+    await test.info().attach("Dropdown Data", {
+      body: JSON.stringify(optionDataArray, null, 2),
+      contentType: "application/json",
+    });
+  }
+
+  genUniqueRandomIndexes(max, total) {
+    const result = new Set();
+
+    while (result.size < total) {
+      const rand = Math.floor(Math.random() * max); // 0 to max-1
+      result.add(rand);
+    }
+
+    return Array.from(result);
+  }
+
+  async selectOptionsByIndex(selectLocator, indexes) {
+    await this.page.selectOption(
+      selectLocator,
+      indexes.map((i) => ({ index: i })),
+    );
+  }
+
+  async verifySelectedOptions(selectLocator, optionDataArray, indexes) {
+    const selectedOptions = await this.page
+      .locator(`${selectLocator} option:checked`)
+      .all();
+
+    const selectedValues = [];
+
+    for (const option of selectedOptions) {
+      const val = await option.getAttribute("value");
+      selectedValues.push(val);
+    }
+
+    indexes.forEach((index) => {
+      const expectedValue = optionDataArray[index].value;
+      expect(selectedValues).toContain(expectedValue);
+    });
+  }
+}
+
+module.exports = Project02_HelperClass_pt07;
+
+
+const { test, expect } = require("@playwright/test");
+
+class Project02_HelperClass_pt08 {
+  static client = ["Yuna", "Linda", "乐乐", "凯凯", "Sophia"];
+  constructor(page) {
+    this.page = page;
+  }
+  async navigate() {
+    await this.page.goto("https://taqelah.sg/automation-testing-practice.html");
+  }
+  async scrollToSection(locator, testStep) {
+    await test.step(`Step ${testStep}`, async () => {
+      await locator.scrollIntoViewIfNeeded();
+    });
+  }
+  async tc084ShowAlert(btnLocator, alertMsgResult, resultLocator1, resultMsg) {
+    await test.step(`Step 4: Click Show Alert and validate alert`, async () => {
+      this.page.once("dialog", async (dialog) => {
+        await expect(dialog.message()).toBe(alertMsgResult);
+        await dialog.accept();
+      });
+      await this.page.click(btnLocator);
+    });
+
+    await test.step(`Step 5: Validate alert result message`, async () => {
+      let resultLocator = this.page.locator(resultLocator1);
+      await expect(resultLocator).toHaveText(resultMsg);
+    });
+  }
+  async tc085ShowConfirmCancel(
+    btnLocator,
+    alertResult,
+    resultLocator1,
+    resultDisplay,
+  ) {
+    await test.step(`Step 3: Click Show Confirm`, async () => {
+      this.page.once("dialog", async (dialog) => {
+        await test.step(`Step 4: Validate alert message`, async () => {
+          await expect(dialog.message()).toBe(alertResult);
+        });
+        await test.step(`Step 5: Click Cancel`, async () => {
+          await dialog.dismiss();
+        });
+      });
+      await this.page.click(btnLocator);
+    });
+
+    await test.step(`Step 6: Verify confirm cancel result`, async () => {
+      let resultLocator = this.page.locator(resultLocator1);
+      await expect(resultLocator).toHaveText(resultDisplay);
+    });
+  }
+  async tc086ShowConfirmOK(
+    btnLocator,
+    alertResult,
+    resultLocator1,
+    resultDisplay,
+  ) {
+    await test.step(`Step 3: Click Show Confirm`, async () => {
+      this.page.once("dialog", async (dialog) => {
+        await test.step(`Step 4: Validate alert message`, async () => {
+          await expect(dialog.message()).toBe(alertResult);
+        });
+        await test.step(`Step 5: Click OK`, async () => {
+          await dialog.accept();
+        });
+      });
+      await this.page.click(btnLocator);
+    });
+
+    await test.step(`Step 6: Verify confirm OK result`, async () => {
+      let resultLocator = this.page.locator(resultLocator1);
+      await expect(resultLocator).toHaveText(resultDisplay);
+    });
+  }
+  async handlePromptInput(
+    btnLocator,
+    index,
+    resultLocator,
+    resultDisplayPrefix,
+  ) {
+    const clientName = Project02_HelperClass_pt08.client[index];
+
+    await test.step(`Step 3: Click Show Prompt`, async () => {
+      this.page.once("dialog", async (dialog) => {
+        await test.step(`Step 4: Enter name and click OK`, async () => {
+          await dialog.accept(clientName);
+        });
+      });
+
+      await this.page.click(btnLocator);
+    });
+
+    await test.step(`Step 5: Verify prompt result`, async () => {
+      const result = this.page.locator(resultLocator);
+
+      await expect(result).toHaveText(`${resultDisplayPrefix}${clientName}`);
+    });
+  }
+}
+
+module.exports = Project02_HelperClass_pt08;
+
+
+const { test, expect } = require("@playwright/test");
+
+class Project02_HelperClass_pt09 {
+  constructor(page) {
+    this.page = page;
+  }
+  async navigate() {
+    await this.page.goto("https://taqelah.sg/automation-testing-practice.html");
+  }
+  async scrollToSection(locator, testStep) {
+    await test.step(`Step ${testStep}`, async () => {
+      await locator.scrollIntoViewIfNeeded();
+    });
+  }
+  async checkTextHiddenFrame() {
+    await test.step(`Step 4: Validate iFrame Content`, async () => {
+      // Debug: Check all frames
+      const frames = this.page.frames();
+      console.log(`Total frames: ${frames.length}`);
+
+      for (let i = 0; i < frames.length; i++) {
+        const frame = frames[i];
+        const isMain = frame === this.page.mainFrame();
+        console.log(`Frame ${i}: isMain=${isMain}, url=${frame.url()}`);
+
+        // Try to get content of each frame
+        const bodyText = await frame
+          .locator("body")
+          .textContent()
+          .catch(() => "Unable to access");
+        if (bodyText.includes("iFrame Content")) {
+          console.log(`Found "iFrame Content" in frame ${i}`);
+        }
+      }
+    });
+  }
+  async tc094_inputTextFrame(textInput) {
+    await test.step(`Step 4: Click Load Content in iFrame`, async () => {
+      await this.page.click("#btn-load-iframe");
+    });
+
+    await test.step(`Step 5: Input text inside iFrame`, async () => {
+      const iframeElement = await this.page.waitForSelector("#test-iframe");
+      const frame = await iframeElement.contentFrame();
+
+      const inputLocator = frame.locator("#iframe-input");
+      await inputLocator.waitFor();
+
+      await inputLocator.fill(textInput);
+    });
+
+    await test.step(`Step 6: Validate input text inside iFrame`, async () => {
+      const iframeElement = await this.page.waitForSelector("#test-iframe");
+      const frame = await iframeElement.contentFrame();
+
+      const inputLocator = frame.locator("#iframe-input");
+
+      await expect(inputLocator).toHaveValue(textInput);
+    });
+  }
+  async tc095_clickBtniFrame() {
+    await test.step(`Step 4: Click Load Content in iFrame`, async () => {
+      await this.page.click("#btn-load-iframe");
+    });
+
+    await test.step(`Step 5 + 6: Click button inside iframe and handle alert`, async () => {
+      const iframeElement = await this.page.waitForSelector("#test-iframe");
+      const frame = await iframeElement.contentFrame();
+      this.page.once("dialog", async (dialog) => {
+        await test.step(`Step 6: Validatre alert message`, async () => {
+          await expect(dialog.message()).toBe("Button clicked inside iframe!");
+        });
+        await dialog.accept();
+      });
+      await frame.click("#iframe-button");
+    });
+  }
+}
+
+module.exports = Project02_HelperClass_pt09;
+
+const { test, expect } = require("@playwright/test");
+
+class Project02_HelperClass_pt10 {
+  constructor(page) {
+    this.page = page;
+  }
+  async navigate() {
+    await this.page.goto("https://taqelah.sg/automation-testing-practice.html");
+  }
+  async scrollToSection(locator, testStep) {
+    await test.step(`Step ${testStep}`, async () => {
+      await locator.scrollIntoViewIfNeeded();
+    });
+  }
+  async tc098OpenNewTab(expectedResult) {
+    let newTab;
+    await test.step(`Step 4: Click Open New Tab`, async () => {
+      const [tab] = await Promise.all([
+        this.page.context().waitForEvent("page"),
+        this.page.click("#btn-new-tab"),
+      ]);
+      newTab = tab;
+    });
+
+    await test.step(`Step 5: Validate new tab is opened`, async () => {
+      await newTab.waitForLoadState();
+      const bodyText = await newTab.locator("body").textContent();
+
+      await expect(bodyText.trim()).toBe("");
+    });
+
+    await test.step(`Step 6: Validate parent tab result`, async () => {
+      const resultLocator = this.page.locator("#window-info");
+      await expect(resultLocator).toHaveText(expectedResult);
+    });
+  }
+}
+
+module.exports = Project02_HelperClass_pt10;
+
+const { test, expect } = require("@playwright/test");
+
+class Project02_HelperClass_pt11 {
+  constructor(page) {
+    this.page = page;
+  }
+  async navigate() {
+    await this.page.goto("https://taqelah.sg/automation-testing-practice.html");
+  }
+  async scrollToSection(locator, testStep) {
+    await test.step(`Step ${testStep}`, async () => {
+      await locator.scrollIntoViewIfNeeded();
+    });
+  }
+  async dropItem(itemNum) {
+    const itemLocator1 = "#item" + String(itemNum);
+    const itemLocator2 = "#drop-zone " + itemLocator1;
+
+    await test.step(`Step 4: Drage and drop Item ${itemNum}`, async () => {
+      const source = this.page.locator(itemLocator1);
+      const target = this.page.locator("#drop-zone");
+      await source.dragTo(target);
+    });
+
+    await test.step(`Step 5: Validate item is dropped`, async () => {
+      const droppedItem = this.page.locator(itemLocator2);
+      await expect(droppedItem).toBeVisible();
+    });
+  }
+}
+
+module.exports = Project02_HelperClass_pt11;
+
+
+const { test, expect } = require("@playwright/test");
+
+class Project02_HelperClass_pt12 {
+  constructor(page) {
+    this.page = page;
+  }
+  async navigate() {
+    await this.page.goto("https://taqelah.sg/automation-testing-practice.html");
+  }
+  async scrollToSection(locator, testStep) {
+    await test.step(`Step ${testStep}`, async () => {
+      await locator.scrollIntoViewIfNeeded();
+    });
+  }
+  async validateSubHeader(locatorLabel, expectedText) {
+    await test.step(`Step 4 + 5: Validate label`, async () => {
+      const subHeaderLocator = this.page.locator(
+        `label[for="${locatorLabel}"]`,
+      );
+      await expect(subHeaderLocator).toHaveText(expectedText);
+    });
+  }
+  async uploadSingleFile(fileUploadLocation, fileName) {
+    await test.step(`Step 4 + 5: Upload file`, async () => {
+      const fileInput = this.page.locator("#file-upload");
+      await fileInput.setInputFiles(fileUploadLocation);
+    });
+
+    await test.step(`Step 6: Validate uploaded file name`, async () => {
+      const fileInfo = this.page.locator("#file-info");
+      await expect(fileInfo).toContainText(`Name: ${fileName}`);
+    });
+  }
+  async uploadMultipleFiles(
+    file1,
+    fileName1,
+    file2,
+    fileName2,
+    file3,
+    fileName3,
+  ) {
+    await test.step(`Step 4 + 5: Upload multiple files`, async () => {
+      const fileInput = this.page.locator("#file-upload-multiple");
+      await fileInput.setInputFiles([file1, file2, file3]);
+    });
+
+    const fileNames = [fileName1, fileName2, fileName3];
+
+    await test.step(`Step 6: Validate uploaded file names`, async () => {
+      const fileInfo = this.page.locator("#file-info");
+      for (const name of fileNames) {
+        await expect(fileInfo).toContainText(name);
+      }
+    });
+  }
+}
+
+module.exports = Project02_HelperClass_pt12;
+
+
+const { test, expect } = require("@playwright/test");
+
+class Project02_HelperClass_pt13 {
+  constructor(page) {
+    this.page = page;
+  }
+  async navigate() {
+    await this.page.goto("https://taqelah.sg/automation-testing-practice.html");
+  }
+  async scrollToSection(locator, testStep) {
+    await test.step(`Step ${testStep}`, async () => {
+      await locator.scrollIntoViewIfNeeded();
+    });
+  }
+}
+
+module.exports = Project02_HelperClass_pt13;
+
+
+// tests
+
+const { test, expect } = require("@playwright/test");
+const Project02_HelperClass_pt01 = require("../pages/Project02_HelperClass_pt01");
+
+let prj02Pt01;
+test.beforeEach(async ({ page }) => {
+  prj02Pt01 = new Project02_HelperClass_pt01(page);
+});
+
+test("TC001 - Access Automation Testing Practice Page", async ({ page }) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt01.navigate();
+  });
+  await test.step(`Step 2: Verify the Website Page Header`, async () => {
+    await prj02Pt01.validateWebsiteTitle("Automation Testing Practice Page");
+  });
+});
+
+test("TC002 - From Section 1, validate field header", async ({ page }) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt01.navigate();
+  });
+  let headerLocator = page.getByRole("heading", { name: "Input Fields" });
+  await prj02Pt01.tc002(headerLocator, "1. Input Fields");
+});
+
+test("TC003 - From Section 1, validate the field labels", async ({ page }) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt01.navigate();
+  });
+  let extractedInputFields = await page
+    .getByTestId("section-input-fields")
+    .textContent();
+  let extractedFieldsArray =
+    await prj02Pt01.tc003_getExpectedArrayFieldLabel(extractedInputFields);
+
+  let field1 = page.getByText("Username:");
+  field1 = await prj02Pt01.tc003_getExtractedFieldLabel(field1);
+  let field1Check = prj02Pt01.tc003_getNormalisedExpectedFieldLabel(
+    extractedFieldsArray,
+    4,
+  );
+
+  await test.step(`Step 3: Expected extracted field label for Username field: ${field1}`, async () => {});
+  await test.step(`Step 4: Actual extracted field label for Username field after normalization: ${field1Check}`, async () => {});
+
+  await prj02Pt01.tc003_fieldValidation(field1, field1Check, "Username", 5);
+
+  let field2 = page.getByText("Email:");
+  field2 = await prj02Pt01.tc003_getExtractedFieldLabel(field2);
+  let field2Check = prj02Pt01.tc003_getNormalisedExpectedFieldLabel(
+    extractedFieldsArray,
+    5,
+  );
+
+  await test.step(`Step 6: Expected extracted field label for Email field: ${field2}`, async () => {});
+  await test.step(`Step 7: Actual extracted field label for Email field after normalization: ${field2Check}`, async () => {});
+
+  await prj02Pt01.tc003_fieldValidation(field2, field2Check, "Email", 8);
+
+  let field3 = page.getByText("Password:");
+  field3 = await prj02Pt01.tc003_getExtractedFieldLabel(field3);
+  let field3Check = prj02Pt01.tc003_getNormalisedExpectedFieldLabel(
+    extractedFieldsArray,
+    6,
+  );
+
+  await test.step(`Step 9: Expected extracted field label for Password field: ${field3}`, async () => {});
+  await test.step(`Step 10: Actual extracted field label for Password field after normalization: ${field3Check}`, async () => {});
+
+  await prj02Pt01.tc003_fieldValidation(field3, field3Check, "Password", 11);
+
+  let field4 = page.getByText("Age:");
+  field4 = await prj02Pt01.tc003_getExtractedFieldLabel(field4);
+  let field4Check = prj02Pt01.tc003_getNormalisedExpectedFieldLabel(
+    extractedFieldsArray,
+    7,
+  );
+
+  await test.step(`Step 12: Expected extracted field label for Age field: ${field4}`, async () => {});
+  await test.step(`Step 13: Actual extracted field label for Age field after normalization: ${field4Check}`, async () => {});
+
+  await prj02Pt01.tc003_fieldValidation(field4, field4Check, "Age", 14);
+
+  let field5 = page.getByText("Date of Birth:");
+  field5 = await prj02Pt01.tc003_getExtractedFieldLabel(field5);
+  let field5Check1 = prj02Pt01.tc003_getNormalisedExpectedFieldLabel(
+    extractedFieldsArray,
+    8,
+  );
+  let field5Check2 = prj02Pt01.tc003_getNormalisedExpectedFieldLabel(
+    extractedFieldsArray,
+    9,
+  );
+  let field5Check3 = prj02Pt01.tc003_getNormalisedExpectedFieldLabel(
+    extractedFieldsArray,
+    10,
+  );
+  let field5Check = field5Check1 + " " + field5Check2 + " " + field5Check3;
+
+  await test.step(`Step 15: Expected extracted field label for Date of Birth field: ${field5}`, async () => {});
+  await test.step(`Step 16: Actual extracted field label for Date of Birth field after normalization: ${field5Check}`, async () => {});
+
+  await prj02Pt01.tc003_fieldValidation(
+    field5,
+    field5Check,
+    "Date of Birth",
+    17,
+  );
+
+  let field6 = page.getByText("Comments:");
+  field6 = await prj02Pt01.tc003_getExtractedFieldLabel(field6);
+  let field6Check = prj02Pt01.tc003_getNormalisedExpectedFieldLabel(
+    extractedFieldsArray,
+    11,
+  );
+
+  await test.step(`Step 18: Expected extracted field label for Comments field: ${field6}`, async () => {});
+  await test.step(`Step 19: Actual extracted field label for Comments field after normalization: ${field6Check}`, async () => {});
+
+  await prj02Pt01.tc003_fieldValidation(field6, field6Check, "Comments", 20);
+});
+
+test("TC004 - Verify filling up UserName Field", async ({ page }) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt01.navigate();
+  });
+  let randIdx = prj02Pt01.genNum(0, 19);
+  let user = prj02Pt01.getUserName(randIdx);
+  let userNameFieldLocator = page.getByTestId("input-username");
+  await prj02Pt01.tc004_fillUserName(user, userNameFieldLocator, 2);
+});
+
+test("TC005 - Verify filling up Email Field", async ({ page }) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt01.navigate();
+  });
+  let randIdx = prj02Pt01.genNum(0, 19);
+  let user = prj02Pt01.getUserName(randIdx);
+  let userNameFieldLocator = page.getByTestId("input-username");
+  await prj02Pt01.tc004_fillUserName(user, userNameFieldLocator, 2);
+  let userEmail = user + "@gmail.com";
+  let userEmailLocator = page.getByTestId("input-email");
+  await prj02Pt01.tc005_fillUserEmail(userEmail, userEmailLocator, 3);
+});
+
+test("TC006 - Verify filling up Password Field", async ({ page }) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt01.navigate();
+  });
+  let randIdx = prj02Pt01.genNum(0, 19);
+  let user = prj02Pt01.getUserName(randIdx);
+  let userNameFieldLocator = page.getByTestId("input-username");
+  await prj02Pt01.tc004_fillUserName(user, userNameFieldLocator, 2);
+  let userEmail = user + "@gmail.com";
+  let userEmailLocator = page.getByTestId("input-email");
+  await prj02Pt01.tc005_fillUserEmail(userEmail, userEmailLocator, 3);
+  let pwd = user + "123";
+  let userPwdLocator = page.getByTestId("input-password");
+  await prj02Pt01.tc006_fillUserPwd(pwd, userPwdLocator, 4);
+});
+
+test("TC007 - Verify filling up Age Field", async ({ page }) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt01.navigate();
+  });
+  let randIdx = prj02Pt01.genNum(0, 19);
+  let user = prj02Pt01.getUserName(randIdx);
+  let userNameFieldLocator = page.getByTestId("input-username");
+  await prj02Pt01.tc004_fillUserName(user, userNameFieldLocator, 2);
+  let userEmail = user + "@gmail.com";
+  let userEmailLocator = page.getByTestId("input-email");
+  await prj02Pt01.tc005_fillUserEmail(userEmail, userEmailLocator, 3);
+  let pwd = user + "123";
+  let userPwdLocator = page.getByTestId("input-password");
+  await prj02Pt01.tc006_fillUserPwd(pwd, userPwdLocator, 4);
+  let age = prj02Pt01.genNum(20, 40);
+  age = String(age);
+  let userAgeLocator = page.getByTestId("input-age");
+  await prj02Pt01.tc007_fillUserAge(age, userAgeLocator, 5);
+});
+
+test("TC008 - Verify filling up Date Of Birth Field", async ({ page }) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt01.navigate();
+  });
+  let randIdx = prj02Pt01.genNum(0, 19);
+  let user = prj02Pt01.getUserName(randIdx);
+  let userNameFieldLocator = page.getByTestId("input-username");
+  await prj02Pt01.tc004_fillUserName(user, userNameFieldLocator, 2);
+  let userEmail = user + "@gmail.com";
+  let userEmailLocator = page.getByTestId("input-email");
+  await prj02Pt01.tc005_fillUserEmail(userEmail, userEmailLocator, 3);
+  let pwd = user + "123";
+  let userPwdLocator = page.getByTestId("input-password");
+  await prj02Pt01.tc006_fillUserPwd(pwd, userPwdLocator, 4);
+  let age = prj02Pt01.genNum(20, 40);
+  age = String(age);
+  let userAgeLocator = page.getByTestId("input-age");
+  await prj02Pt01.tc007_fillUserAge(age, userAgeLocator, 5);
+
+  let dateOfBirth = prj02Pt01.tc008_getDateOfBirth(age);
+  let userDOBLocator = page.getByTestId("input-dob");
+  await prj02Pt01.tc008_fillUserDateOfBirth(dateOfBirth, userDOBLocator, 6);
+});
+
+test("TC009 - Verify filling up Comments Field", async ({ page }) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt01.navigate();
+  });
+  let randIdx = prj02Pt01.genNum(0, 19);
+  let user = prj02Pt01.getUserName(randIdx);
+  let userNameFieldLocator = page.getByTestId("input-username");
+  await prj02Pt01.tc004_fillUserName(user, userNameFieldLocator, 2);
+  let userEmail = user + "@gmail.com";
+  let userEmailLocator = page.getByTestId("input-email");
+  await prj02Pt01.tc005_fillUserEmail(userEmail, userEmailLocator, 3);
+  let pwd = user + "123";
+  let userPwdLocator = page.getByTestId("input-password");
+  await prj02Pt01.tc006_fillUserPwd(pwd, userPwdLocator, 4);
+  let age = prj02Pt01.genNum(20, 40);
+  age = String(age);
+  let userAgeLocator = page.getByTestId("input-age");
+  await prj02Pt01.tc007_fillUserAge(age, userAgeLocator, 5);
+
+  let dateOfBirth = prj02Pt01.tc008_getDateOfBirth(age);
+  let userDOBLocator = page.getByTestId("input-dob");
+  await prj02Pt01.tc008_fillUserDateOfBirth(dateOfBirth, userDOBLocator, 6);
+
+  let comments = user + " input comments!";
+  let userCommentsLocator = page.getByTestId("input-comments");
+  await prj02Pt01.tc009_fillUserComments(comments, userCommentsLocator, 7);
+});
+
+const { test, expect } = require("@playwright/test");
+const Project02_HelperClass_pt02 = require("../pages/Project02_HelperClass_pt02");
+
+let prj02Pt02;
+test.beforeEach(async ({ page }) => {
+  prj02Pt02 = new Project02_HelperClass_pt02(page);
+});
+
+test("TC010 - From Section 2, validate field header", async ({ page }) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt02.navigate();
+  });
+  let headerLocator = page
+    .getByTestId("section-buttons")
+    .getByRole("heading", { name: "Buttons" });
+  await prj02Pt02.scrollToSection(
+    headerLocator,
+    "2: Scoll down to Section 2 - Buttons Section",
+  );
+  await prj02Pt02.tc10_validateSection2Header(headerLocator, "2. Buttons");
+});
+
+test('TC011 - Section 2 - Validate the Timestamp when user clicks the button "Click Me"', async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt02.navigate();
+  });
+  let section2Locator = page
+    .getByTestId("section-buttons")
+    .getByRole("heading", { name: "Buttons" });
+  await prj02Pt02.scrollToSection(
+    section2Locator,
+    "2: Scoll down to Section 2 - Buttons Section",
+  );
+  let btn = "Click Me";
+  await prj02Pt02.tc11_validateTimeStamp(btn, "Button clicked!", "Timestamp:");
+});
+
+test('TC012 - Section 2 - Validate the Timestamp when user clicks the button "Double Click Me"', async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt02.navigate();
+  });
+  let section2Locator = page
+    .getByTestId("section-buttons")
+    .getByRole("heading", { name: "Buttons" });
+  await prj02Pt02.scrollToSection(
+    section2Locator,
+    "2: Scoll down to Section 2 - Buttons Section",
+  );
+  let btn = "Double Click Me";
+  await prj02Pt02.tc12_validateTimeStamp(
+    btn,
+    "Button double-clicked!",
+    "Timestamp:",
+  );
+});
+
+test('TC013 - Section 2 - Validate the Timestamp when user right-clicks the button "Right Click Me"', async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt02.navigate();
+  });
+  let section2Locator = page
+    .getByTestId("section-buttons")
+    .getByRole("heading", { name: "Buttons" });
+  await prj02Pt02.scrollToSection(
+    section2Locator,
+    "2: Scoll down to Section 2 - Buttons Section",
+  );
+  let btn = "Right Click Me";
+  await prj02Pt02.tc13_validateTimeStamp(
+    btn,
+    "Button right-clicked!",
+    "Timestamp:",
+  );
+});
+
+const { test, expect } = require("@playwright/test");
+const Project02_HelperClass_pt03 = require("../pages/Project02_HelperClass_pt03");
+
+let prj02Pt03;
+
+test.beforeEach(async ({ page }) => {
+  prj02Pt03 = new Project02_HelperClass_pt03(page);
+});
+
+test("TC014 - From Section 3, validate field header", async ({ page }) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt03.navigate();
+  });
+  let headerLocator = page.getByRole("heading", { name: "Radio Buttons" });
+  await prj02Pt03.scrollToSection(
+    headerLocator,
+    "2: Scoll down to Section 3 - Radio Buttons Section",
+  );
+  await prj02Pt03.tc14_validateSection3Header(
+    headerLocator,
+    "3. Radio Buttons",
+  );
+});
+
+test("TC015 - From Section 3, validate sub field labels - Select Gender:", async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt03.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", { name: "Radio Buttons" });
+
+  await prj02Pt03.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 3 - Radio Buttons Section",
+  );
+
+  let expectedResultLocator = await page
+    .getByText("Select Gender:")
+    .textContent();
+
+  let actualResultLocator = await page
+    .getByTestId("section-radio-buttons")
+    .textContent();
+
+  await prj02Pt03.tc15_validateSubLabelsSection3(
+    expectedResultLocator,
+    actualResultLocator,
+  );
+});
+
+test("TC016 - From Section 3, validate sub field labels - Experience Level:", async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt03.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", { name: "Radio Buttons" });
+
+  await prj02Pt03.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 3 - Radio Buttons Section",
+  );
+
+  let expectedResultLocator = await page
+    .getByText("Experience Level:")
+    .textContent();
+
+  let actualResultLocator = await page
+    .getByTestId("section-radio-buttons")
+    .textContent();
+
+  await prj02Pt03.tc16_validateSubLabelsSection3(
+    expectedResultLocator,
+    actualResultLocator,
+  );
+});
+
+test('TC017 - Select the Radio Button where Gender = "Male"', async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt03.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", { name: "Radio Buttons" });
+
+  await prj02Pt03.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 3 - Radio Buttons Section",
+  );
+
+  let radioButtonLocator = page.getByTestId("radio-male");
+  let stepTestLabel = "Male";
+  await prj02Pt03.checkRadioButton(radioButtonLocator, stepTestLabel);
+});
+
+test('TC018 - Select the Radio Button where Gender = "Female"', async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt03.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", { name: "Radio Buttons" });
+
+  await prj02Pt03.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 3 - Radio Buttons Section",
+  );
+
+  let radioButtonLocator = page.getByTestId("radio-female");
+  let stepTestLabel = "Female";
+  await prj02Pt03.checkRadioButton(radioButtonLocator, stepTestLabel);
+});
+
+test('TC019 - Select the Radio Button where Gender = "Other"', async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt03.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", { name: "Radio Buttons" });
+
+  await prj02Pt03.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 3 - Radio Buttons Section",
+  );
+
+  let radioButtonLocator = page.getByTestId("radio-other");
+  let stepTestLabel = "Other";
+  await prj02Pt03.checkRadioButton(radioButtonLocator, stepTestLabel);
+});
+
+test("TC020 - Select the Gender Radio Button based on randomisation", async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt03.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", { name: "Radio Buttons" });
+
+  await prj02Pt03.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 3 - Radio Buttons Section",
+  );
+
+  let randNum = prj02Pt03.genNum(1, 3);
+  let radioButtonLocator1 = page.getByTestId("radio-male");
+  let radioButtonLocator2 = page.getByTestId("radio-female");
+  let radioButtonLocator3 = page.getByTestId("radio-other");
+  if (randNum === 1) {
+    await prj02Pt03.checkRadioButton(radioButtonLocator1, "Male");
+  } else if (randNum === 2) {
+    await prj02Pt03.checkRadioButton(radioButtonLocator2, "Female");
+  } else if (randNum === 3) {
+    await prj02Pt03.checkRadioButton(radioButtonLocator3, "Other");
+  }
+});
+
+test('TC021 - Select the Radio Button where Experience Level = "Beginner"', async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt03.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", { name: "Radio Buttons" });
+
+  await prj02Pt03.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 3 - Radio Buttons Section",
+  );
+
+  let randNum = prj02Pt03.genNum(1, 3);
+  let radioButtonLocator1 = page.getByTestId("radio-male");
+  let radioButtonLocator2 = page.getByTestId("radio-female");
+  let radioButtonLocator3 = page.getByTestId("radio-other");
+  if (randNum === 1) {
+    await prj02Pt03.checkRadioButton(radioButtonLocator1, "Male");
+  } else if (randNum === 2) {
+    await prj02Pt03.checkRadioButton(radioButtonLocator2, "Female");
+  } else if (randNum === 3) {
+    await prj02Pt03.checkRadioButton(radioButtonLocator3, "Other");
+  }
+
+  let expRadioBtnLocator = page.getByTestId("radio-beginner");
+  await prj02Pt03.checkRadioButton2(expRadioBtnLocator, "Beginner");
+});
+
+test('TC022 - Select the Radio Button where Experience Level = "Intermediate"', async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt03.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", { name: "Radio Buttons" });
+
+  await prj02Pt03.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 3 - Radio Buttons Section",
+  );
+
+  let randNum = prj02Pt03.genNum(1, 3);
+  let radioButtonLocator1 = page.getByTestId("radio-male");
+  let radioButtonLocator2 = page.getByTestId("radio-female");
+  let radioButtonLocator3 = page.getByTestId("radio-other");
+  if (randNum === 1) {
+    await prj02Pt03.checkRadioButton(radioButtonLocator1, "Male");
+  } else if (randNum === 2) {
+    await prj02Pt03.checkRadioButton(radioButtonLocator2, "Female");
+  } else if (randNum === 3) {
+    await prj02Pt03.checkRadioButton(radioButtonLocator3, "Other");
+  }
+
+  let expRadioBtnLocator = page.getByTestId("radio-intermediate");
+  await prj02Pt03.checkRadioButton2(expRadioBtnLocator, "Intermediate");
+});
+
+test('TC023 - Select the Radio Button where Experience Level = "Expert"', async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt03.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", { name: "Radio Buttons" });
+
+  await prj02Pt03.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 3 - Radio Buttons Section",
+  );
+
+  let randNum = prj02Pt03.genNum(1, 3);
+  let radioButtonLocator1 = page.getByTestId("radio-male");
+  let radioButtonLocator2 = page.getByTestId("radio-female");
+  let radioButtonLocator3 = page.getByTestId("radio-other");
+  if (randNum === 1) {
+    await prj02Pt03.checkRadioButton(radioButtonLocator1, "Male");
+  } else if (randNum === 2) {
+    await prj02Pt03.checkRadioButton(radioButtonLocator2, "Female");
+  } else if (randNum === 3) {
+    await prj02Pt03.checkRadioButton(radioButtonLocator3, "Other");
+  }
+
+  let expRadioBtnLocator = page.getByTestId("radio-expert");
+  await prj02Pt03.checkRadioButton2(expRadioBtnLocator, "Expert");
+});
+
+test("TC024 - Select the Radio Button where Experience Level selection is randomised", async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt03.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", { name: "Radio Buttons" });
+
+  await prj02Pt03.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 3 - Radio Buttons Section",
+  );
+
+  let randNum = prj02Pt03.genNum(1, 3);
+  let radioButtonLocator1 = page.getByTestId("radio-male");
+  let radioButtonLocator2 = page.getByTestId("radio-female");
+  let radioButtonLocator3 = page.getByTestId("radio-other");
+  if (randNum === 1) {
+    await prj02Pt03.checkRadioButton(radioButtonLocator1, "Male");
+  } else if (randNum === 2) {
+    await prj02Pt03.checkRadioButton(radioButtonLocator2, "Female");
+  } else if (randNum === 3) {
+    await prj02Pt03.checkRadioButton(radioButtonLocator3, "Other");
+  }
+
+  randNum = prj02Pt03.genNum(1, 3);
+  let expRadioBtnLocator1 = page.getByTestId("radio-beginner");
+  let expRadioBtnLocator2 = page.getByTestId("radio-intermediate");
+  let expRadioBtnLocator3 = page.getByTestId("radio-expert");
+  if (randNum === 1) {
+    await prj02Pt03.checkRadioButton2(expRadioBtnLocator1, "Beginner");
+  } else if (randNum === 2) {
+    await prj02Pt03.checkRadioButton2(expRadioBtnLocator2, "Intermediate");
+  } else if (randNum === 3) {
+    await prj02Pt03.checkRadioButton2(expRadioBtnLocator3, "Expert");
+  }
+});
+
+const { test, expect } = require("@playwright/test");
+const Project02_HelperClass_pt04 = require("../pages/Project02_HelperClass_pt04");
+const { waitForDebugger } = require("node:inspector");
+
+let prj02Pt04;
+
+test.beforeEach(async ({ page }) => {
+  prj02Pt04 = new Project02_HelperClass_pt04(page);
+});
+
+test("TC025 - From Section 4, validate field header", async ({ page }) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt04.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", { name: "Checkboxes" });
+  await prj02Pt04.scrollToSection(
+    headerLocator,
+    "2: Scoll down to Section 4 - Check Boxes Section",
+  );
+  await prj02Pt04.tc25_validateSection4Header(headerLocator, "4. Checkboxes");
+});
+
+test("TC026 - From Section 4, validate sub field labels - Select Programming Languages:", async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt04.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", { name: "Checkboxes" });
+  await prj02Pt04.scrollToSection(
+    headerLocator,
+    "2: Scoll down to Section 4 - Check Boxes Section",
+  );
+  await prj02Pt04.tc25_validateSection4Header(headerLocator, "4. Checkboxes");
+  let expectedResultLocator = await page.getByText(
+    "Select Programming Languages:",
+  );
+  let actualResultLocator = await page.getByTestId("section-checkboxes");
+  await prj02Pt04.tc26_validateSection4SubHeader(
+    expectedResultLocator,
+    actualResultLocator,
+  );
+});
+
+test("TC027 - From Section 4, validate sub field labels - I agree to terms and conditions", async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt04.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", { name: "Checkboxes" });
+  await prj02Pt04.scrollToSection(
+    headerLocator,
+    "2: Scoll down to Section 4 - Check Boxes Section",
+  );
+
+  await prj02Pt04.tc25_validateSection4Header(headerLocator, "4. Checkboxes");
+
+  let expectedResultLocator = page.getByText("I agree to terms and conditions");
+  let actualResultLocator = await page.getByTestId("section-checkboxes");
+  await prj02Pt04.tc27_validateSection4SubHeader(
+    expectedResultLocator,
+    actualResultLocator,
+  );
+});
+
+test('TC028 - From Section 4, Checkboxes, check the option: "JavaScript"', async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt04.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", { name: "Checkboxes" });
+  await prj02Pt04.scrollToSection(
+    headerLocator,
+    "2: Scoll down to Section 4 - Check Boxes Section",
+  );
+
+  await prj02Pt04.tc25_validateSection4Header(headerLocator, "4. Checkboxes");
+
+  let checkboxLocator = page.getByTestId("checkbox-javascript");
+  let programmingLanguage = "JavaScript";
+  await prj02Pt04.selectCheckBox(checkboxLocator, programmingLanguage);
+});
+
+test('TC029 - From Section 4 - Checkboxes, check the option: "Python"', async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt04.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", { name: "Checkboxes" });
+  await prj02Pt04.scrollToSection(
+    headerLocator,
+    "2: Scoll down to Section 4 - Check Boxes Section",
+  );
+
+  await prj02Pt04.tc25_validateSection4Header(headerLocator, "4. Checkboxes");
+
+  let checkboxLocator = page.getByTestId("checkbox-python");
+  let programmingLanguage = "Python";
+  await prj02Pt04.selectCheckBox(checkboxLocator, programmingLanguage);
+});
+
+test('TC030 - From Section 4 - Checkboxes, check the option: "Java"', async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt04.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", { name: "Checkboxes" });
+  await prj02Pt04.scrollToSection(
+    headerLocator,
+    "2: Scoll down to Section 4 - Check Boxes Section",
+  );
+
+  await prj02Pt04.tc25_validateSection4Header(headerLocator, "4. Checkboxes");
+
+  let checkboxLocator = page.getByTestId("checkbox-java");
+  let programmingLanguage = "Java";
+  await prj02Pt04.selectCheckBox(checkboxLocator, programmingLanguage);
+});
+
+test('TC031 - From Section 4 - Checkboxes, check the option: "C#"', async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt04.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", { name: "Checkboxes" });
+  await prj02Pt04.scrollToSection(
+    headerLocator,
+    "2: Scoll down to Section 4 - Check Boxes Section",
+  );
+
+  await prj02Pt04.tc25_validateSection4Header(headerLocator, "4. Checkboxes");
+
+  let checkboxLocator = page.getByTestId("checkbox-csharp");
+  let programmingLanguage = "C#";
+  await prj02Pt04.selectCheckBox(checkboxLocator, programmingLanguage);
+});
+
+test("TC032 - From Section 4 - Checkboxes, check two randomised option", async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt04.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", { name: "Checkboxes" });
+  await prj02Pt04.scrollToSection(
+    headerLocator,
+    "2: Scoll down to Section 4 - Check Boxes Section",
+  );
+
+  await prj02Pt04.tc25_validateSection4Header(headerLocator, "4. Checkboxes");
+
+  let randNum1 = prj02Pt04.genNum(1, 4);
+  let randNum2;
+
+  do {
+    randNum2 = prj02Pt04.genNum(1, 4);
+  } while (randNum2 === randNum1);
+
+  let checkboxLocators = [
+    page.getByTestId("checkbox-javascript"),
+    page.getByTestId("checkbox-python"),
+    page.getByTestId("checkbox-java"),
+    page.getByTestId("checkbox-csharp"),
+  ];
+
+  let checkboxNames = ["JavaScript", "Python", "Java", "C#"];
+
+  await prj02Pt04.selectCheckBox(
+    checkboxLocators[randNum1 - 1],
+    checkboxNames[randNum1 - 1],
+  );
+
+  await prj02Pt04.selectCheckBox(
+    checkboxLocators[randNum2 - 1],
+    checkboxNames[randNum2 - 1],
+  );
+});
+
+test("TC033 - From Section 4 - Checkboxes, check three randomised option", async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt04.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", { name: "Checkboxes" });
+  await prj02Pt04.scrollToSection(
+    headerLocator,
+    "2: Scoll down to Section 4 - Check Boxes Section",
+  );
+
+  await prj02Pt04.tc25_validateSection4Header(headerLocator, "4. Checkboxes");
+
+  let randNum1 = prj02Pt04.genNum(1, 4);
+  let randNum2;
+  let randNum3;
+
+  do {
+    randNum2 = prj02Pt04.genNum(1, 4);
+  } while (randNum2 === randNum1);
+
+  do {
+    randNum3 = prj02Pt04.genNum(1, 4);
+  } while (randNum3 === randNum1 || randNum3 === randNum2);
+
+  let checkboxLocators = [
+    page.getByTestId("checkbox-javascript"),
+    page.getByTestId("checkbox-python"),
+    page.getByTestId("checkbox-java"),
+    page.getByTestId("checkbox-csharp"),
+  ];
+
+  let checkboxNames = ["JavaScript", "Python", "Java", "C#"];
+
+  await prj02Pt04.selectCheckBox(
+    checkboxLocators[randNum1 - 1],
+    checkboxNames[randNum1 - 1],
+  );
+
+  await prj02Pt04.selectCheckBox(
+    checkboxLocators[randNum2 - 1],
+    checkboxNames[randNum2 - 1],
+  );
+
+  await prj02Pt04.selectCheckBox(
+    checkboxLocators[randNum3 - 1],
+    checkboxNames[randNum3 - 1],
+  );
+});
+
+test("TC034 - From Section 4 - I agree to the terms and conditions", async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt04.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", { name: "Checkboxes" });
+  await prj02Pt04.scrollToSection(
+    headerLocator,
+    "2: Scoll down to Section 4 - Check Boxes Section",
+  );
+
+  await prj02Pt04.tc25_validateSection4Header(headerLocator, "4. Checkboxes");
+
+  let randNum1 = prj02Pt04.genNum(1, 4);
+  let randNum2;
+  let randNum3;
+
+  do {
+    randNum2 = prj02Pt04.genNum(1, 4);
+  } while (randNum2 === randNum1);
+
+  do {
+    randNum3 = prj02Pt04.genNum(1, 4);
+  } while (randNum3 === randNum1 || randNum3 === randNum2);
+
+  let checkboxLocators = [
+    page.getByTestId("checkbox-javascript"),
+    page.getByTestId("checkbox-python"),
+    page.getByTestId("checkbox-java"),
+    page.getByTestId("checkbox-csharp"),
+  ];
+
+  let checkboxNames = ["JavaScript", "Python", "Java", "C#"];
+
+  await prj02Pt04.selectCheckBox(
+    checkboxLocators[randNum1 - 1],
+    checkboxNames[randNum1 - 1],
+  );
+
+  await prj02Pt04.selectCheckBox(
+    checkboxLocators[randNum2 - 1],
+    checkboxNames[randNum2 - 1],
+  );
+
+  await prj02Pt04.selectCheckBox(
+    checkboxLocators[randNum3 - 1],
+    checkboxNames[randNum3 - 1],
+  );
+
+  let termsConditionChkBox = page.getByTestId("checkbox-agree-terms");
+  let item = "Terms and Conditions";
+  await prj02Pt04.selectCheckBox2(termsConditionChkBox, item);
+});
+
+test("TC035 - From Section 4 - Select the Check All Languages Checkbox", async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt04.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", { name: "Checkboxes" });
+  await prj02Pt04.scrollToSection(
+    headerLocator,
+    "2: Scoll down to Section 4 - Check Boxes Section",
+  );
+
+  await prj02Pt04.tc25_validateSection4Header(headerLocator, "4. Checkboxes");
+
+  await prj02Pt04.tc35_selectAllCheckBoxes();
+});
+
+test("TC036 - From Section 4 - Select the Uncheck All Languages Checkbox", async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt04.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", { name: "Checkboxes" });
+  await prj02Pt04.scrollToSection(
+    headerLocator,
+    "2: Scoll down to Section 4 - Check Boxes Section",
+  );
+
+  await prj02Pt04.tc25_validateSection4Header(headerLocator, "4. Checkboxes");
+
+  await prj02Pt04.tc35_selectAllCheckBoxes();
+
+  await prj02Pt04.tc36_unselectAllCheckBoxes();
+});
+
+const { test, expect } = require("@playwright/test");
+const Project02_HelperClass_pt05 = require("../pages/Project02_HelperClass_pt05");
+
+let prj02Pt05;
+
+test.beforeEach(async ({ page }) => {
+  prj02Pt05 = new Project02_HelperClass_pt05(page);
+});
+
+test("TC037 - From Section 5, validate field header", async ({ page }) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt05.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", {
+    name: "Static Dropdown (Single Select)",
+  });
+
+  await prj02Pt05.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 5 - Static Dropdown (Single Select) Section",
+  );
+
+  await prj02Pt05.tc37_validateSection5Header(
+    headerLocator,
+    "5. Static Dropdown (Single Select)",
+  );
+});
+
+test("TC038 - From Section 5, validate sub field header", async ({ page }) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt05.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", {
+    name: "Static Dropdown (Single Select)",
+  });
+
+  await prj02Pt05.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 5 - Static Dropdown (Single Select) Section",
+  );
+
+  await prj02Pt05.tc37_validateSection5Header(
+    headerLocator,
+    "5. Static Dropdown (Single Select)",
+  );
+
+  let expectedResultLocator = await page.getByText("Select Country:");
+  let actualResultLocator = await page.getByTestId("section-static-dropdown");
+
+  await prj02Pt05.tc38_validateSection5Header(
+    expectedResultLocator,
+    actualResultLocator,
+  );
+});
+
+test("TC039 - From Section 5, check number of items in the Static Dropdown", async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt05.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", {
+    name: "Static Dropdown (Single Select)",
+  });
+
+  await prj02Pt05.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 5 - Static Dropdown (Single Select) Section",
+  );
+
+  await prj02Pt05.tc37_validateSection5Header(
+    headerLocator,
+    "5. Static Dropdown (Single Select)",
+  );
+  await prj02Pt05.tc39_checkItemsInStaticDropdown();
+});
+
+test('TC040 - From Section 5, select "United States" from the Single Select Static Dropdown', async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt05.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", {
+    name: "Static Dropdown (Single Select)",
+  });
+
+  await prj02Pt05.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 5 - Static Dropdown (Single Select) Section",
+  );
+
+  await prj02Pt05.tc37_validateSection5Header(
+    headerLocator,
+    "5. Static Dropdown (Single Select)",
+  );
+
+  let countryDropdownLocator = page.getByTestId("select-country");
+  let dropdownValue = "usa";
+  let testStepLabel = "United States";
+
+  await prj02Pt05.selectStaticDropDownValue(
+    countryDropdownLocator,
+    dropdownValue,
+    testStepLabel,
+  );
+});
+
+test('TC041 - From Section 5, select "United Kingdom" from the Single Select Static Dropdown', async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt05.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", {
+    name: "Static Dropdown (Single Select)",
+  });
+
+  await prj02Pt05.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 5 - Static Dropdown (Single Select) Section",
+  );
+
+  await prj02Pt05.tc37_validateSection5Header(
+    headerLocator,
+    "5. Static Dropdown (Single Select)",
+  );
+
+  let countryDropdownLocator = page.getByTestId("select-country");
+  let dropdownValue = "uk";
+  let testStepLabel = "United Kingdom";
+
+  await prj02Pt05.selectStaticDropDownValue(
+    countryDropdownLocator,
+    dropdownValue,
+    testStepLabel,
+  );
+});
+
+test('TC042 - From Section 5, select "Canada" from the Single Select Static Dropdown', async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt05.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", {
+    name: "Static Dropdown (Single Select)",
+  });
+
+  await prj02Pt05.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 5 - Static Dropdown (Single Select) Section",
+  );
+
+  await prj02Pt05.tc37_validateSection5Header(
+    headerLocator,
+    "5. Static Dropdown (Single Select)",
+  );
+
+  let countryDropdownLocator = page.getByTestId("select-country");
+  let dropdownValue = "canada";
+  let testStepLabel = "Canada";
+
+  await prj02Pt05.selectStaticDropDownValue(
+    countryDropdownLocator,
+    dropdownValue,
+    testStepLabel,
+  );
+});
+
+test('TC043 - From Section 5, select "Australia" from the Single Select Static Dropdown', async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt05.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", {
+    name: "Static Dropdown (Single Select)",
+  });
+
+  await prj02Pt05.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 5 - Static Dropdown (Single Select) Section",
+  );
+
+  await prj02Pt05.tc37_validateSection5Header(
+    headerLocator,
+    "5. Static Dropdown (Single Select)",
+  );
+
+  let countryDropdownLocator = page.getByTestId("select-country");
+  let dropdownValue = "australia";
+  let testStepLabel = "Australia";
+
+  await prj02Pt05.selectStaticDropDownValue(
+    countryDropdownLocator,
+    dropdownValue,
+    testStepLabel,
+  );
+});
+
+test('TC044 - From Section 5, select "India" from the Single Select Static Dropdown', async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt05.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", {
+    name: "Static Dropdown (Single Select)",
+  });
+
+  await prj02Pt05.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 5 - Static Dropdown (Single Select) Section",
+  );
+
+  await prj02Pt05.tc37_validateSection5Header(
+    headerLocator,
+    "5. Static Dropdown (Single Select)",
+  );
+
+  let countryDropdownLocator = page.getByTestId("select-country");
+  let dropdownValue = "india";
+  let testStepLabel = "India";
+
+  await prj02Pt05.selectStaticDropDownValue(
+    countryDropdownLocator,
+    dropdownValue,
+    testStepLabel,
+  );
+});
+
+test('TC045 - From Section 5, select "Germany" from the Single Select Static Dropdown', async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt05.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", {
+    name: "Static Dropdown (Single Select)",
+  });
+
+  await prj02Pt05.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 5 - Static Dropdown (Single Select) Section",
+  );
+
+  await prj02Pt05.tc37_validateSection5Header(
+    headerLocator,
+    "5. Static Dropdown (Single Select)",
+  );
+
+  let countryDropdownLocator = page.getByTestId("select-country");
+  let dropdownValue = "germany";
+  let testStepLabel = "Germany";
+
+  await prj02Pt05.selectStaticDropDownValue(
+    countryDropdownLocator,
+    dropdownValue,
+    testStepLabel,
+  );
+});
+
+test('TC046 - From Section 5, select "France" from the Single Select Static Dropdown', async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt05.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", {
+    name: "Static Dropdown (Single Select)",
+  });
+
+  await prj02Pt05.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 5 - Static Dropdown (Single Select) Section",
+  );
+
+  await prj02Pt05.tc37_validateSection5Header(
+    headerLocator,
+    "5. Static Dropdown (Single Select)",
+  );
+
+  let countryDropdownLocator = page.getByTestId("select-country");
+  let dropdownValue = "france";
+  let testStepLabel = "France";
+
+  await prj02Pt05.selectStaticDropDownValue(
+    countryDropdownLocator,
+    dropdownValue,
+    testStepLabel,
+  );
+});
+
+test("TC047 - From Section 5, select randomly from the Single Select Static Dropdown", async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt05.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", {
+    name: "Static Dropdown (Single Select)",
+  });
+
+  await prj02Pt05.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 5 - Static Dropdown (Single Select) Section",
+  );
+
+  await prj02Pt05.tc37_validateSection5Header(
+    headerLocator,
+    "5. Static Dropdown (Single Select)",
+  );
+
+  let randNum = prj02Pt05.genNum(1, 7);
+
+  let countryValues = [
+    "usa",
+    "uk",
+    "canada",
+    "australia",
+    "india",
+    "germany",
+    "france",
+  ];
+
+  let countryLabels = [
+    "United States",
+    "United Kingdom",
+    "Canada",
+    "Australia",
+    "India",
+    "Germany",
+    "France",
+  ];
+
+  let countryDropdownLocator = page.getByTestId("select-country");
+
+  let dropdownValue = countryValues[randNum - 1];
+  let testStepLabel = countryLabels[randNum - 1];
+
+  await test.step(`Step 3: Random Number Generated = ${randNum}, Country Selected = ${testStepLabel}`, async () => {});
+
+  await prj02Pt05.selectStaticDropDownValue(
+    countryDropdownLocator,
+    dropdownValue,
+    testStepLabel,
+  );
+});
+
+const { test, expect } = require("@playwright/test");
+const Project02_HelperClass_pt06 = require("../pages/Project02_HelperClass_pt06");
+
+let prj02Pt06;
+
+test.beforeEach(async ({ page }) => {
+  prj02Pt06 = new Project02_HelperClass_pt06(page);
+});
+
+test("TC048 - From Section 6, validate field header", async ({ page }) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt06.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", {
+    name: "6. Dynamic Dropdown (Dependent Dropdowns)",
+  });
+
+  await prj02Pt06.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 6 - Dynamic Dropdown (Dependent Dropdown Select) Section",
+  );
+
+  await prj02Pt06.tc48_validateSection5Header(
+    headerLocator,
+    "6. Dynamic Dropdown (Dependent Dropdowns)",
+  );
+});
+
+test("TC049 - From Section 6, validate sub field header - Select Category:", async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt06.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", {
+    name: "6. Dynamic Dropdown (Dependent Dropdowns)",
+  });
+
+  await prj02Pt06.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 6 - Dynamic Dropdown (Dependent Dropdown Select) Section",
+  );
+
+  await prj02Pt06.tc48_validateSection5Header(
+    headerLocator,
+    "6. Dynamic Dropdown (Dependent Dropdowns)",
+  );
+
+  let subHeaderLocator = page.getByText("Select Category:");
+  let expectedResult = "Select Category:";
+  await prj02Pt06.validateSubHeader(subHeaderLocator, expectedResult);
+});
+
+test("TC050- From Section 6, validate sub field header - Select Subcategory:", async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt06.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", {
+    name: "6. Dynamic Dropdown (Dependent Dropdowns)",
+  });
+
+  await prj02Pt06.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 6 - Dynamic Dropdown (Dependent Dropdown Select) Section",
+  );
+
+  await prj02Pt06.tc48_validateSection5Header(
+    headerLocator,
+    "6. Dynamic Dropdown (Dependent Dropdowns)",
+  );
+
+  let subHeaderLocator = page.getByText("Select Subcategory:");
+  let expectedResult = "Select Subcategory:";
+  await prj02Pt06.validateSubHeader(subHeaderLocator, expectedResult);
+});
+
+test("TC051- From Section 6, Dynamic Dropdown, verify the number of items under Select Category Dropdown", async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt06.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", {
+    name: "6. Dynamic Dropdown (Dependent Dropdowns)",
+  });
+
+  await prj02Pt06.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 6 - Dynamic Dropdown (Dependent Dropdown Select) Section",
+  );
+
+  await prj02Pt06.tc48_validateSection5Header(
+    headerLocator,
+    "6. Dynamic Dropdown (Dependent Dropdowns)",
+  );
+
+  let dropdownLocator = page.locator("#category-select option");
+  await prj02Pt06.validateDropDownItemsCount(dropdownLocator, 4);
+});
+
+test('TC052- From Section 6, Dynamic Dropdown, verify the number of items under Select Subcategory Dropdown where Category = "Electronics"', async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt06.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", {
+    name: "6. Dynamic Dropdown (Dependent Dropdowns)",
+  });
+
+  await prj02Pt06.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 6 - Dynamic Dropdown (Dependent Dropdown Select) Section",
+  );
+
+  await prj02Pt06.tc48_validateSection5Header(
+    headerLocator,
+    "6. Dynamic Dropdown (Dependent Dropdowns)",
+  );
+
+  let categoryItem = "Electronics";
+  let optionValue = "electronics";
+  let expectedNumItems = 5;
+  await prj02Pt06.validateDropDownSubCategoryItemsCount(
+    categoryItem,
+    optionValue,
+    expectedNumItems,
+  );
+});
+
+test('TC053- From Section 6, Dynamic Dropdown, verify the number of items under Select Subcategory Dropdown where Category = "Clothing"', async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt06.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", {
+    name: "6. Dynamic Dropdown (Dependent Dropdowns)",
+  });
+
+  await prj02Pt06.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 6 - Dynamic Dropdown (Dependent Dropdown Select) Section",
+  );
+
+  await prj02Pt06.tc48_validateSection5Header(
+    headerLocator,
+    "6. Dynamic Dropdown (Dependent Dropdowns)",
+  );
+
+  let categoryItem = "Clothing";
+  let optionValue = "clothing";
+  let expectedNumItems = 5;
+  await prj02Pt06.validateDropDownSubCategoryItemsCount(
+    categoryItem,
+    optionValue,
+    expectedNumItems,
+  );
+});
+
+test('TC054 - From Section 6, Dynamic Dropdown, verify the number of items under Select Subcategory Dropdown where Category = "Books"', async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt06.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", {
+    name: "6. Dynamic Dropdown (Dependent Dropdowns)",
+  });
+
+  await prj02Pt06.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 6 - Dynamic Dropdown (Dependent Dropdown Select) Section",
+  );
+
+  await prj02Pt06.tc48_validateSection5Header(
+    headerLocator,
+    "6. Dynamic Dropdown (Dependent Dropdowns)",
+  );
+
+  let categoryItem = "Books";
+  let optionValue = "books";
+  let expectedNumItems = 5;
+  await prj02Pt06.validateDropDownSubCategoryItemsCount(
+    categoryItem,
+    optionValue,
+    expectedNumItems,
+  );
+});
+
+test('TC055 - From Section 6, Dynamic Dropdown, select the dropdown where Sub Category = "Laptop"', async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt06.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", {
+    name: "6. Dynamic Dropdown (Dependent Dropdowns)",
+  });
+
+  await prj02Pt06.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 6 - Dynamic Dropdown (Dependent Dropdown Select) Section",
+  );
+
+  await prj02Pt06.tc48_validateSection5Header(
+    headerLocator,
+    "6. Dynamic Dropdown (Dependent Dropdowns)",
+  );
+
+  let subCategorySelection = "Laptops";
+  let optionValue = "laptops";
+  await prj02Pt06.categoryElectronics_subCategorySelection(
+    subCategorySelection,
+    optionValue,
+  );
+});
+
+test('TC056 - From Section 6, Dynamic Dropdown, select the dropdown where Sub Category = "Smartphones"', async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt06.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", {
+    name: "6. Dynamic Dropdown (Dependent Dropdowns)",
+  });
+
+  await prj02Pt06.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 6 - Dynamic Dropdown (Dependent Dropdown Select) Section",
+  );
+
+  await prj02Pt06.tc48_validateSection5Header(
+    headerLocator,
+    "6. Dynamic Dropdown (Dependent Dropdowns)",
+  );
+
+  let subCategorySelection = "Smartphones";
+  let optionValue = "smartphones";
+  await prj02Pt06.categoryElectronics_subCategorySelection(
+    subCategorySelection,
+    optionValue,
+  );
+});
+
+test('TC057 - From Section 6, Dynamic Dropdown, select the dropdown where Sub Category = "Tablets"', async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt06.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", {
+    name: "6. Dynamic Dropdown (Dependent Dropdowns)",
+  });
+
+  await prj02Pt06.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 6 - Dynamic Dropdown (Dependent Dropdown Select) Section",
+  );
+
+  await prj02Pt06.tc48_validateSection5Header(
+    headerLocator,
+    "6. Dynamic Dropdown (Dependent Dropdowns)",
+  );
+
+  let subCategorySelection = "Tablets";
+  let optionValue = "tablets";
+  await prj02Pt06.categoryElectronics_subCategorySelection(
+    subCategorySelection,
+    optionValue,
+  );
+});
+
+test('TC058 - From Section 6, Dynamic Dropdown, select the dropdown where Sub Category = "Cameras"', async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt06.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", {
+    name: "6. Dynamic Dropdown (Dependent Dropdowns)",
+  });
+
+  await prj02Pt06.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 6 - Dynamic Dropdown (Dependent Dropdown Select) Section",
+  );
+
+  await prj02Pt06.tc48_validateSection5Header(
+    headerLocator,
+    "6. Dynamic Dropdown (Dependent Dropdowns)",
+  );
+
+  let subCategorySelection = "Cameras";
+  let optionValue = "cameras";
+  await prj02Pt06.categoryElectronics_subCategorySelection(
+    subCategorySelection,
+    optionValue,
+  );
+});
+
+test('TC059 - From Section 6, Dynamic Dropdown, select the dropdown where Sub Category = "Shirts"', async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt06.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", {
+    name: "6. Dynamic Dropdown (Dependent Dropdowns)",
+  });
+
+  await prj02Pt06.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 6 - Dynamic Dropdown (Dependent Dropdown Select) Section",
+  );
+
+  await prj02Pt06.tc48_validateSection5Header(
+    headerLocator,
+    "6. Dynamic Dropdown (Dependent Dropdowns)",
+  );
+
+  let subCategorySelection = "Shirts";
+  let optionValue = "shirts";
+
+  await prj02Pt06.categoryClothing_subCategorySelection(
+    subCategorySelection,
+    optionValue,
+  );
+});
+
+test('TC060 - From Section 6, Dynamic Dropdown, select the dropdown where Sub Category = "Pants"', async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt06.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", {
+    name: "6. Dynamic Dropdown (Dependent Dropdowns)",
+  });
+
+  await prj02Pt06.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 6 - Dynamic Dropdown (Dependent Dropdown Select) Section",
+  );
+
+  await prj02Pt06.tc48_validateSection5Header(
+    headerLocator,
+    "6. Dynamic Dropdown (Dependent Dropdowns)",
+  );
+
+  let subCategorySelection = "Pants";
+  let optionValue = "pants";
+
+  await prj02Pt06.categoryClothing_subCategorySelection(
+    subCategorySelection,
+    optionValue,
+  );
+});
+
+test('TC061 - From Section 6, Dynamic Dropdown, select the dropdown where Sub Category = "Dresses"', async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt06.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", {
+    name: "6. Dynamic Dropdown (Dependent Dropdowns)",
+  });
+
+  await prj02Pt06.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 6 - Dynamic Dropdown (Dependent Dropdown Select) Section",
+  );
+
+  await prj02Pt06.tc48_validateSection5Header(
+    headerLocator,
+    "6. Dynamic Dropdown (Dependent Dropdowns)",
+  );
+
+  let subCategorySelection = "Dresses";
+  let optionValue = "dresses";
+
+  await prj02Pt06.categoryClothing_subCategorySelection(
+    subCategorySelection,
+    optionValue,
+  );
+});
+
+test('TC062 - From Section 6, Dynamic Dropdown, select the dropdown where Sub Category = "Shoes"', async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt06.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", {
+    name: "6. Dynamic Dropdown (Dependent Dropdowns)",
+  });
+
+  await prj02Pt06.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 6 - Dynamic Dropdown (Dependent Dropdown Select) Section",
+  );
+
+  await prj02Pt06.tc48_validateSection5Header(
+    headerLocator,
+    "6. Dynamic Dropdown (Dependent Dropdowns)",
+  );
+
+  let subCategorySelection = "Shoes";
+  let optionValue = "shoes";
+
+  await prj02Pt06.categoryClothing_subCategorySelection(
+    subCategorySelection,
+    optionValue,
+  );
+});
+
+test('TC063 - From Section 6, Dynamic Dropdown, select the dropdown where Sub Category = "Fiction"', async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt06.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", {
+    name: "6. Dynamic Dropdown (Dependent Dropdowns)",
+  });
+
+  await prj02Pt06.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 6 - Dynamic Dropdown (Dependent Dropdown Select) Section",
+  );
+
+  await prj02Pt06.tc48_validateSection5Header(
+    headerLocator,
+    "6. Dynamic Dropdown (Dependent Dropdowns)",
+  );
+
+  let subCategorySelection = "Fiction";
+  let optionValue = "fiction";
+
+  await prj02Pt06.categoryBooks_subCategorySelection(
+    subCategorySelection,
+    optionValue,
+  );
+});
+
+test('TC064 - From Section 6, Dynamic Dropdown, select the dropdown where Sub Category = "Non-Fiction"', async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt06.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", {
+    name: "6. Dynamic Dropdown (Dependent Dropdowns)",
+  });
+
+  await prj02Pt06.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 6 - Dynamic Dropdown (Dependent Dropdown Select) Section",
+  );
+
+  await prj02Pt06.tc48_validateSection5Header(
+    headerLocator,
+    "6. Dynamic Dropdown (Dependent Dropdowns)",
+  );
+
+  let subCategorySelection = "Non-Fiction";
+  let optionValue = "non-fiction";
+
+  await prj02Pt06.categoryBooks_subCategorySelection(
+    subCategorySelection,
+    optionValue,
+  );
+});
+
+test('TC065 - From Section 6, Dynamic Dropdown, select the dropdown where Sub Category = "Science"', async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt06.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", {
+    name: "6. Dynamic Dropdown (Dependent Dropdowns)",
+  });
+
+  await prj02Pt06.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 6 - Dynamic Dropdown (Dependent Dropdown Select) Section",
+  );
+
+  await prj02Pt06.tc48_validateSection5Header(
+    headerLocator,
+    "6. Dynamic Dropdown (Dependent Dropdowns)",
+  );
+
+  let subCategorySelection = "Science";
+  let optionValue = "science";
+
+  await prj02Pt06.categoryBooks_subCategorySelection(
+    subCategorySelection,
+    optionValue,
+  );
+});
+
+test('TC066 - From Section 6, Dynamic Dropdown, select the dropdown where Sub Category = "History"', async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt06.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", {
+    name: "6. Dynamic Dropdown (Dependent Dropdowns)",
+  });
+
+  await prj02Pt06.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 6 - Dynamic Dropdown (Dependent Dropdown Select) Section",
+  );
+
+  await prj02Pt06.tc48_validateSection5Header(
+    headerLocator,
+    "6. Dynamic Dropdown (Dependent Dropdowns)",
+  );
+
+  let subCategorySelection = "History";
+  let optionValue = "history";
+
+  await prj02Pt06.categoryBooks_subCategorySelection(
+    subCategorySelection,
+    optionValue,
+  );
+});
+
+const { test, expect } = require("@playwright/test");
+const Project02_HelperClass_pt07 = require("../pages/Project02_HelperClass_pt07");
+
+let prj02Pt07;
+
+test.beforeEach(async ({ page }) => {
+  prj02Pt07 = new Project02_HelperClass_pt07(page);
+});
+
+test("TC067 - From Section 7, validate field header", async ({ page }) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt07.navigate();
+  });
+  let headerLocator = page.getByRole("heading", {
+    name: "7. Multi-Select Dropdown",
+  });
+  await prj02Pt07.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 7 - Multi-Select Dropdown",
+  );
+  await test.step(`Step 3: Validate Section 7 Header`, async () => {
+    await expect(headerLocator).toHaveText("7. Multi-Select Dropdown");
+  });
+});
+
+test("TC068 - From Section 7, validate sub-field header", async ({ page }) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt07.navigate();
+  });
+  let headerLocator = page.getByRole("heading", {
+    name: "7. Multi-Select Dropdown",
+  });
+  await prj02Pt07.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 7 - Multi-Select Dropdown",
+  );
+  await test.step(`Step 3: Validate Section 7 Header`, async () => {
+    await expect(headerLocator).toHaveText("7. Multi-Select Dropdown");
+  });
+  let subHeaderLocator = page.locator('label[for="skills-select"]');
+  await test.step(`Step 4: Validate Sub Field Header`, async () => {
+    await expect(subHeaderLocator).toHaveText(
+      "Select Skills (Hold Ctrl/Cmd to select multiple):",
+    );
+  });
+});
+
+test('TC069 - From Section 7, select the option = "HTML"', async ({ page }) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt07.navigate();
+  });
+  let headerLocator = page.getByRole("heading", {
+    name: "7. Multi-Select Dropdown",
+  });
+  await prj02Pt07.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 7 - Multi-Select Dropdown",
+  );
+
+  let optionLocator = page.locator("#skills-select option");
+  let optionLabel = "HTML";
+  let optionValue = "html";
+  let optionIndex = 0;
+  await prj02Pt07.selectMultiDropdownValue(
+    optionLocator,
+    optionLabel,
+    optionValue,
+    optionIndex,
+  );
+});
+
+test('TC070 - From Section 7, select the option = "CSS"', async ({ page }) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt07.navigate();
+  });
+  let headerLocator = page.getByRole("heading", {
+    name: "7. Multi-Select Dropdown",
+  });
+  await prj02Pt07.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 7 - Multi-Select Dropdown",
+  );
+
+  let optionLocator = page.locator("#skills-select option");
+  let optionLabel = "CSS";
+  let optionValue = "css";
+  let optionIndex = 1;
+  await prj02Pt07.selectMultiDropdownValue(
+    optionLocator,
+    optionLabel,
+    optionValue,
+    optionIndex,
+  );
+});
+
+test('TC071 - From Section 7, select the option = "JavaScript"', async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt07.navigate();
+  });
+  let headerLocator = page.getByRole("heading", {
+    name: "7. Multi-Select Dropdown",
+  });
+  await prj02Pt07.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 7 - Multi-Select Dropdown",
+  );
+
+  let optionLocator = page.locator("#skills-select option");
+  let optionLabel = "JavaScript";
+  let optionValue = "javascript";
+  let optionIndex = 2;
+  await prj02Pt07.selectMultiDropdownValue(
+    optionLocator,
+    optionLabel,
+    optionValue,
+    optionIndex,
+  );
+});
+
+test('TC072 - From Section 7, select the option = "React"', async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt07.navigate();
+  });
+  let headerLocator = page.getByRole("heading", {
+    name: "7. Multi-Select Dropdown",
+  });
+  await prj02Pt07.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 7 - Multi-Select Dropdown",
+  );
+
+  let optionLocator = page.locator("#skills-select option");
+  let optionLabel = "React";
+  let optionValue = "react";
+  let optionIndex = 3;
+  await prj02Pt07.selectMultiDropdownValue(
+    optionLocator,
+    optionLabel,
+    optionValue,
+    optionIndex,
+  );
+});
+
+test('TC073 - From Section 7, select the option = "Angular"', async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt07.navigate();
+  });
+  let headerLocator = page.getByRole("heading", {
+    name: "7. Multi-Select Dropdown",
+  });
+  await prj02Pt07.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 7 - Multi-Select Dropdown",
+  );
+
+  let optionLocator = page.locator("#skills-select option");
+  let optionLabel = "Angular";
+  let optionValue = "angular";
+  let optionIndex = 4;
+  await prj02Pt07.selectMultiDropdownValue(
+    optionLocator,
+    optionLabel,
+    optionValue,
+    optionIndex,
+  );
+});
+
+test('TC074 - From Section 7, select the option = "Vue.js"', async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt07.navigate();
+  });
+  let headerLocator = page.getByRole("heading", {
+    name: "7. Multi-Select Dropdown",
+  });
+  await prj02Pt07.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 7 - Multi-Select Dropdown",
+  );
+
+  let optionLocator = page.locator("#skills-select option");
+  let optionLabel = "Vue.js";
+  let optionValue = "vue";
+  let optionIndex = 5;
+  await prj02Pt07.selectMultiDropdownValue(
+    optionLocator,
+    optionLabel,
+    optionValue,
+    optionIndex,
+  );
+});
+
+test('TC075 - From Section 7, select the option = "Node.js"', async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt07.navigate();
+  });
+  let headerLocator = page.getByRole("heading", {
+    name: "7. Multi-Select Dropdown",
+  });
+  await prj02Pt07.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 7 - Multi-Select Dropdown",
+  );
+
+  let optionLocator = page.locator("#skills-select option");
+  let optionLabel = "Node.js";
+  let optionValue = "nodejs";
+  let optionIndex = 6;
+  await prj02Pt07.selectMultiDropdownValue(
+    optionLocator,
+    optionLabel,
+    optionValue,
+    optionIndex,
+  );
+});
+
+test('TC076 - From Section 7, select the option = "Python"', async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt07.navigate();
+  });
+  let headerLocator = page.getByRole("heading", {
+    name: "7. Multi-Select Dropdown",
+  });
+  await prj02Pt07.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 7 - Multi-Select Dropdown",
+  );
+
+  let optionLocator = page.locator("#skills-select option");
+  let optionLabel = "Python";
+  let optionValue = "python";
+  let optionIndex = 7;
+  await prj02Pt07.selectMultiDropdownValue(
+    optionLocator,
+    optionLabel,
+    optionValue,
+    optionIndex,
+  );
+});
+
+test("TC077 - From Section 7, randomly select 2 options from the Multiple-Select Dropdown", async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt07.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", {
+    name: "7. Multi-Select Dropdown",
+  });
+
+  await prj02Pt07.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 7 - Multi-Select Dropdown",
+  );
+
+  let optionLocator = page.locator("#skills-select option");
+
+  let optionDataArray;
+  await test.step(`Step 3: Extract all options`, async () => {
+    optionDataArray = await prj02Pt07.extractOptionData(optionLocator);
+    await prj02Pt07.attachOptionData(optionDataArray);
+  });
+
+  let randIndexes;
+  await test.step(`Step 4: Generate 2 unique random indexes`, async () => {
+    randIndexes = prj02Pt07.genUniqueRandomIndexes(optionDataArray.length, 2);
+  });
+
+  await test.step(`Step 5: Validate generated indexes`, async () => {
+    randIndexes.forEach((index) => {
+      expect(optionDataArray[index]).toBeDefined();
+    });
+  });
+
+  await test.step(`Step 6: Select 2 options using index: "${randIndexes}"`, async () => {
+    await prj02Pt07.selectOptionsByIndex("#skills-select", randIndexes);
+  });
+
+  await test.step(`Step 7: Verify both selections`, async () => {
+    await prj02Pt07.verifySelectedOptions(
+      "#skills-select",
+      optionDataArray,
+      randIndexes,
+    );
+  });
+});
+
+test("TC078 - From Section 7, randomly select 3 options from the Multiple-Select Dropdown", async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt07.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", {
+    name: "7. Multi-Select Dropdown",
+  });
+
+  await prj02Pt07.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 7 - Multi-Select Dropdown",
+  );
+
+  let optionLocator = page.locator("#skills-select option");
+
+  let optionDataArray;
+  await test.step(`Step 3: Extract all options`, async () => {
+    optionDataArray = await prj02Pt07.extractOptionData(optionLocator);
+    await prj02Pt07.attachOptionData(optionDataArray);
+  });
+
+  let randIndexes;
+  await test.step(`Step 4: Generate 3 unique random indexes`, async () => {
+    randIndexes = prj02Pt07.genUniqueRandomIndexes(optionDataArray.length, 3);
+  });
+
+  await test.step(`Step 5: Validate generated indexes`, async () => {
+    randIndexes.forEach((index) => {
+      expect(optionDataArray[index]).toBeDefined();
+    });
+  });
+
+  await test.step(`Step 6: Select 3 options using index: "${randIndexes}"`, async () => {
+    await prj02Pt07.selectOptionsByIndex("#skills-select", randIndexes);
+  });
+
+  await test.step(`Step 7: Verify both selections`, async () => {
+    await prj02Pt07.verifySelectedOptions(
+      "#skills-select",
+      optionDataArray,
+      randIndexes,
+    );
+  });
+});
+
+test("TC079 - From Section 7, randomly select 4 options from the Multiple-Select Dropdown", async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt07.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", {
+    name: "7. Multi-Select Dropdown",
+  });
+
+  await prj02Pt07.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 7 - Multi-Select Dropdown",
+  );
+
+  let optionLocator = page.locator("#skills-select option");
+
+  let optionDataArray;
+  await test.step(`Step 3: Extract all options`, async () => {
+    optionDataArray = await prj02Pt07.extractOptionData(optionLocator);
+    await prj02Pt07.attachOptionData(optionDataArray);
+  });
+
+  let randIndexes;
+  await test.step(`Step 4: Generate 4 unique random indexes`, async () => {
+    randIndexes = prj02Pt07.genUniqueRandomIndexes(optionDataArray.length, 4);
+  });
+
+  await test.step(`Step 5: Validate generated indexes`, async () => {
+    randIndexes.forEach((index) => {
+      expect(optionDataArray[index]).toBeDefined();
+    });
+  });
+
+  await test.step(`Step 6: Select 4 options using index: "${randIndexes}"`, async () => {
+    await prj02Pt07.selectOptionsByIndex("#skills-select", randIndexes);
+  });
+
+  await test.step(`Step 7: Verify both selections`, async () => {
+    await prj02Pt07.verifySelectedOptions(
+      "#skills-select",
+      optionDataArray,
+      randIndexes,
+    );
+  });
+});
+
+test("TC080 - From Section 7, randomly select 5 options from the Multiple-Select Dropdown", async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt07.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", {
+    name: "7. Multi-Select Dropdown",
+  });
+
+  await prj02Pt07.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 7 - Multi-Select Dropdown",
+  );
+
+  let optionLocator = page.locator("#skills-select option");
+
+  let optionDataArray;
+  await test.step(`Step 3: Extract all options`, async () => {
+    optionDataArray = await prj02Pt07.extractOptionData(optionLocator);
+    await prj02Pt07.attachOptionData(optionDataArray);
+  });
+
+  let randIndexes;
+  await test.step(`Step 4: Generate 5 unique random indexes`, async () => {
+    randIndexes = prj02Pt07.genUniqueRandomIndexes(optionDataArray.length, 5);
+  });
+
+  await test.step(`Step 5: Validate generated indexes`, async () => {
+    randIndexes.forEach((index) => {
+      expect(optionDataArray[index]).toBeDefined();
+    });
+  });
+
+  await test.step(`Step 6: Select 5 options using index: "${randIndexes}"`, async () => {
+    await prj02Pt07.selectOptionsByIndex("#skills-select", randIndexes);
+  });
+
+  await test.step(`Step 7: Verify both selections`, async () => {
+    await prj02Pt07.verifySelectedOptions(
+      "#skills-select",
+      optionDataArray,
+      randIndexes,
+    );
+  });
+});
+
+test("TC081 - From Section 7, randomly select 6 options from the Multiple-Select Dropdown", async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt07.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", {
+    name: "7. Multi-Select Dropdown",
+  });
+
+  await prj02Pt07.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 7 - Multi-Select Dropdown",
+  );
+
+  let optionLocator = page.locator("#skills-select option");
+
+  let optionDataArray;
+  await test.step(`Step 3: Extract all options`, async () => {
+    optionDataArray = await prj02Pt07.extractOptionData(optionLocator);
+    await prj02Pt07.attachOptionData(optionDataArray);
+  });
+
+  let randIndexes;
+  await test.step(`Step 4: Generate 6 unique random indexes`, async () => {
+    randIndexes = prj02Pt07.genUniqueRandomIndexes(optionDataArray.length, 6);
+  });
+
+  await test.step(`Step 5: Validate generated indexes`, async () => {
+    randIndexes.forEach((index) => {
+      expect(optionDataArray[index]).toBeDefined();
+    });
+  });
+
+  await test.step(`Step 6: Select 6 options using index: "${randIndexes}"`, async () => {
+    await prj02Pt07.selectOptionsByIndex("#skills-select", randIndexes);
+  });
+
+  await test.step(`Step 7: Verify both selections`, async () => {
+    await prj02Pt07.verifySelectedOptions(
+      "#skills-select",
+      optionDataArray,
+      randIndexes,
+    );
+  });
+});
+
+test("TC082 - From Section 7, randomly select 7 options from the Multiple-Select Dropdown", async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt07.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", {
+    name: "7. Multi-Select Dropdown",
+  });
+
+  await prj02Pt07.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 7 - Multi-Select Dropdown",
+  );
+
+  let optionLocator = page.locator("#skills-select option");
+
+  let optionDataArray;
+  await test.step(`Step 3: Extract all options`, async () => {
+    optionDataArray = await prj02Pt07.extractOptionData(optionLocator);
+    await prj02Pt07.attachOptionData(optionDataArray);
+  });
+
+  let randIndexes;
+  await test.step(`Step 4: Generate 7 unique random indexes`, async () => {
+    randIndexes = prj02Pt07.genUniqueRandomIndexes(optionDataArray.length, 7);
+  });
+
+  await test.step(`Step 5: Validate generated indexes`, async () => {
+    randIndexes.forEach((index) => {
+      expect(optionDataArray[index]).toBeDefined();
+    });
+  });
+
+  await test.step(`Step 6: Select 7 options using index: "${randIndexes}"`, async () => {
+    await prj02Pt07.selectOptionsByIndex("#skills-select", randIndexes);
+  });
+
+  await test.step(`Step 7: Verify both selections`, async () => {
+    await prj02Pt07.verifySelectedOptions(
+      "#skills-select",
+      optionDataArray,
+      randIndexes,
+    );
+  });
+});
+
+const { test, expect } = require("@playwright/test");
+const Project02_HelperClass_pt08 = require("../pages/Project02_HelperClass_pt08");
+
+let prj02Pt08;
+
+test.beforeEach(async ({ page }) => {
+  prj02Pt08 = new Project02_HelperClass_pt08(page);
+});
+
+test("TC083 - From Section 8, validate field header", async ({ page }) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt08.navigate();
+  });
+  let headerLocator = page.getByRole("heading", {
+    name: "8. Alerts",
+  });
+
+  await prj02Pt08.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 8 - Alerts",
+  );
+
+  await test.step(`Step 3: Validate Section 8 Header`, async () => {
+    await expect(headerLocator).toHaveText("8. Alerts");
+  });
+});
+
+test("TC084 - From Section 8, click Show alert and validate the alert message displayed", async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt08.navigate();
+  });
+  let headerLocator = page.getByRole("heading", {
+    name: "8. Alerts",
+  });
+
+  await prj02Pt08.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 8 - Alerts",
+  );
+
+  await test.step(`Step 3: Validate Section 8 Header`, async () => {
+    await expect(headerLocator).toHaveText("8. Alerts");
+  });
+
+  const btnLocator = "#btn-alert";
+  const alertMsgResult = "This is a simple alert!";
+  const resultLocator1 = "#alert-result";
+  const resultMsg = "Alert was shown";
+
+  await prj02Pt08.tc084ShowAlert(
+    btnLocator,
+    alertMsgResult,
+    resultLocator1,
+    resultMsg,
+  );
+});
+
+test("TC085 - From Section 8, click Show Confirm, click Cancel and check the message displayed", async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt08.navigate();
+  });
+  let headerLocator = page.getByRole("heading", {
+    name: "8. Alerts",
+  });
+
+  await prj02Pt08.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 8 - Alerts",
+  );
+
+  const btnLocator = "#btn-confirm";
+  const alertResult = "Do you want to proceed?";
+  const resultLocator1 = "#alert-result";
+  const resultDisplay = "Confirm result: Cancel";
+  await prj02Pt08.tc085ShowConfirmCancel(
+    btnLocator,
+    alertResult,
+    resultLocator1,
+    resultDisplay,
+  );
+});
+
+test("TC086 - From Section 8, click Show Confirm, click OK and check the message displayed", async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt08.navigate();
+  });
+  let headerLocator = page.getByRole("heading", {
+    name: "8. Alerts",
+  });
+
+  await prj02Pt08.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 8 - Alerts",
+  );
+
+  const btnLocator = "#btn-confirm";
+  const alertResult = "Do you want to proceed?";
+  const resultLocator1 = "#alert-result";
+  const resultDisplay = "Confirm result: OK";
+  await prj02Pt08.tc086ShowConfirmOK(
+    btnLocator,
+    alertResult,
+    resultLocator1,
+    resultDisplay,
+  );
+});
+
+test("TC087 - From Section 8, click Show Prompt, click Cancel and check the message displayed", async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt08.navigate();
+  });
+  let headerLocator = page.getByRole("heading", {
+    name: "8. Alerts",
+  });
+
+  await prj02Pt08.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 8 - Alerts",
+  );
+
+  await test.step(`Step 3: Click Show Prompt`, async () => {
+    page.once("dialog", async (dialog) => {
+      await test.step(`Step 4: Click Cancel`, async () => {
+        await dialog.dismiss();
+      });
+    });
+    await page.click("#btn-prompt");
+  });
+
+  await test.step(`Step 5: Verify prompt cancel result`, async () => {
+    let resultLocator = page.locator("#alert-result");
+    await expect(resultLocator).toHaveText("Prompt result: Cancelled");
+  });
+});
+
+test("TC088 - Prompt input using client array where the value = 'Yuna'", async ({
+  page,
+}) => {
+  await prj02Pt08.navigate();
+
+  let headerLocator = page.getByRole("heading", {
+    name: "8. Alerts",
+  });
+
+  await prj02Pt08.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 8 - Alerts",
+  );
+
+  await prj02Pt08.handlePromptInput(
+    "#btn-prompt",
+    0,
+    "#alert-result",
+    "Prompt result: ",
+  );
+});
+
+test("TC089 - Prompt input using client array where the value = 'Linda'", async ({
+  page,
+}) => {
+  await prj02Pt08.navigate();
+
+  let headerLocator = page.getByRole("heading", {
+    name: "8. Alerts",
+  });
+
+  await prj02Pt08.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 8 - Alerts",
+  );
+
+  await prj02Pt08.handlePromptInput(
+    "#btn-prompt",
+    1,
+    "#alert-result",
+    "Prompt result: ",
+  );
+});
+
+test("TC090 - Prompt input using client array where the value = '乐乐'", async ({
+  page,
+}) => {
+  await prj02Pt08.navigate();
+
+  let headerLocator = page.getByRole("heading", {
+    name: "8. Alerts",
+  });
+
+  await prj02Pt08.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 8 - Alerts",
+  );
+
+  await prj02Pt08.handlePromptInput(
+    "#btn-prompt",
+    2,
+    "#alert-result",
+    "Prompt result: ",
+  );
+});
+
+test("TC091 - Prompt input using client array where the value = '凯凯'", async ({
+  page,
+}) => {
+  await prj02Pt08.navigate();
+
+  let headerLocator = page.getByRole("heading", {
+    name: "8. Alerts",
+  });
+
+  await prj02Pt08.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 8 - Alerts",
+  );
+
+  await prj02Pt08.handlePromptInput(
+    "#btn-prompt",
+    3,
+    "#alert-result",
+    "Prompt result: ",
+  );
+});
+
+test("TC092 - Prompt input using client array where the value = 'Sophia'", async ({
+  page,
+}) => {
+  await prj02Pt08.navigate();
+
+  let headerLocator = page.getByRole("heading", {
+    name: "8. Alerts",
+  });
+
+  await prj02Pt08.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 8 - Alerts",
+  );
+
+  await prj02Pt08.handlePromptInput(
+    "#btn-prompt",
+    4,
+    "#alert-result",
+    "Prompt result: ",
+  );
+});
+
+const { test, expect } = require("@playwright/test");
+const Project02_HelperClass_pt09 = require("../pages/Project02_HelperClass_pt09");
+
+let prj02Pt09;
+
+test.beforeEach(async ({ page }) => {
+  prj02Pt09 = new Project02_HelperClass_pt09(page);
+});
+
+test("TC092 - From Section 9, validate field header", async ({ page }) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt09.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", {
+    name: "9. iFrame",
+  });
+
+  await prj02Pt09.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 9 - iFrame",
+  );
+
+  await test.step(`Step 3: Validate Section 9 Header`, async () => {
+    await expect(headerLocator).toHaveText("9. iFrame");
+  });
+});
+
+test("TC093 - From Section 9, verify the sub-heading iFrame Content in a hidden frame", async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt09.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", {
+    name: "9. iFrame",
+  });
+
+  await prj02Pt09.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 9 - iFrame",
+  );
+
+  await test.step(`Step 3: Validate Section 9 Header`, async () => {
+    await expect(headerLocator).toHaveText("9. iFrame");
+  });
+
+  await prj02Pt09.checkTextHiddenFrame();
+});
+
+test("TC094 - From Section 9, input content in iframe", async ({ page }) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt09.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", {
+    name: "9. iFrame",
+  });
+
+  await prj02Pt09.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 9 - iFrame",
+  );
+
+  await test.step(`Step 3: Validate Section 9 Header`, async () => {
+    await expect(headerLocator).toHaveText("9. iFrame");
+  });
+
+  const textInput = "Automated text input using Javascript Playwright";
+  await prj02Pt09.tc094_inputTextFrame(textInput);
+});
+
+test("TC095 - From Section 9, click the button within an iframe", async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt09.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", {
+    name: "9. iFrame",
+  });
+
+  await prj02Pt09.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 9 - iFrame",
+  );
+
+  await test.step(`Step 3: Validate Section 9 Header`, async () => {
+    await expect(headerLocator).toHaveText("9. iFrame");
+  });
+
+  await prj02Pt09.tc095_clickBtniFrame();
+});
+
+const { test, expect } = require("@playwright/test");
+const Project02_HelperClass_pt10 = require("../pages/Project02_HelperClass_pt10");
+
+let prj02Pt10;
+
+test.beforeEach(async ({ page }) => {
+  prj02Pt10 = new Project02_HelperClass_pt10(page);
+});
+
+test("TC096 - From Section 10, validate field header", async ({ page }) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt10.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", {
+    name: "10. Window Handling",
+  });
+
+  await prj02Pt10.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 10 - Window Handling",
+  );
+
+  await test.step(`Step 3: Validate Section 10 Header`, async () => {
+    await expect(headerLocator).toHaveText("10. Window Handling");
+  });
+});
+
+test("TC097 - From Section 10, click the Open New Window Button and validate the contents", async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt10.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", {
+    name: "10. Window Handling",
+  });
+
+  await prj02Pt10.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 10 - Window Handling",
+  );
+
+  await test.step(`Step 3: Validate Section 10 Header`, async () => {
+    await expect(headerLocator).toHaveText("10. Window Handling");
+  });
+
+  let newPage;
+
+  await test.step(`Step 4: Click Open New Window`, async () => {
+    const [popup] = await Promise.all([
+      page.waitForEvent("popup"),
+      page.click("#btn-new-window"),
+    ]);
+    newPage = popup;
+  });
+
+  await test.step(`Step 5: Validate popup window content`, async () => {
+    await newPage.waitForLoadState();
+    await expect(newPage.locator("h1")).toHaveText("New Window for Testing");
+    await expect(newPage.locator("p").nth(0)).toHaveText(
+      "This is a popup window opened for automation testing.",
+    );
+    await expect(newPage.locator("p").nth(1)).toHaveText(
+      "Window name: TestWindow",
+    );
+    await newPage.click("text=Close This Window");
+  });
+
+  await test.step(`Step 6: Validate parent window result`, async () => {
+    const parentResult = page.locator("#window-info");
+    await expect(parentResult).toHaveText(
+      "New window opened with name: TestWindow",
+    );
+  });
+});
+
+test("TC098 - From Section 10, click the Open New Tab Button and validate the contents", async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt10.navigate();
+  });
+
+  let headerLocator = page.getByRole("heading", {
+    name: "10. Window Handling",
+  });
+
+  await prj02Pt10.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 10 - Window Handling",
+  );
+
+  await test.step(`Step 3: Validate Section 10 Header`, async () => {
+    await expect(headerLocator).toHaveText("10. Window Handling");
+  });
+
+  let expectedResult = "New tab opened";
+  await prj02Pt10.tc098OpenNewTab(expectedResult);
+});
+
+const { test, expect } = require("@playwright/test");
+const Project02_HelperClass_pt11 = require("../pages/Project02_HelperClass_pt11");
+
+let prj02Pt11;
+
+test.beforeEach(async ({ page }) => {
+  prj02Pt11 = new Project02_HelperClass_pt11(page);
+});
+
+test("TC099 - From Section 11, validate field header", async ({ page }) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt11.navigate();
+  });
+  let headerLocator = page.getByRole("heading", {
+    name: "11. Drag and Drop",
+  });
+
+  await prj02Pt11.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 11 - Drag and Drop",
+  );
+
+  await test.step(`Step 3: Validate Section 11 Header`, async () => {
+    await expect(headerLocator).toHaveText("11. Drag and Drop");
+  });
+});
+
+test("TC0100 - From Section 11, drag and drop item 1", async ({ page }) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt11.navigate();
+  });
+  let headerLocator = page.getByRole("heading", {
+    name: "11. Drag and Drop",
+  });
+
+  await prj02Pt11.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 11 - Drag and Drop",
+  );
+
+  await test.step(`Step 3: Validate Section 11 Header`, async () => {
+    await expect(headerLocator).toHaveText("11. Drag and Drop");
+  });
+
+  let itemNum = 1;
+  await prj02Pt11.dropItem(itemNum);
+});
+
+test("TC0101 - From Section 11, drag and drop item 2", async ({ page }) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt11.navigate();
+  });
+  let headerLocator = page.getByRole("heading", {
+    name: "11. Drag and Drop",
+  });
+
+  await prj02Pt11.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 11 - Drag and Drop",
+  );
+
+  await test.step(`Step 3: Validate Section 11 Header`, async () => {
+    await expect(headerLocator).toHaveText("11. Drag and Drop");
+  });
+
+  let itemNum = 2;
+  await prj02Pt11.dropItem(itemNum);
+});
+
+test("TC0102 - From Section 11, drag and drop item 3", async ({ page }) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt11.navigate();
+  });
+  let headerLocator = page.getByRole("heading", {
+    name: "11. Drag and Drop",
+  });
+
+  await prj02Pt11.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 11 - Drag and Drop",
+  );
+
+  await test.step(`Step 3: Validate Section 11 Header`, async () => {
+    await expect(headerLocator).toHaveText("11. Drag and Drop");
+  });
+
+  let itemNum = 3;
+  await prj02Pt11.dropItem(itemNum);
+});
+
+test("TC0103 - From Section 11, drag and drop item 4", async ({ page }) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt11.navigate();
+  });
+  let headerLocator = page.getByRole("heading", {
+    name: "11. Drag and Drop",
+  });
+
+  await prj02Pt11.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 11 - Drag and Drop",
+  );
+
+  await test.step(`Step 3: Validate Section 11 Header`, async () => {
+    await expect(headerLocator).toHaveText("11. Drag and Drop");
+  });
+
+  let itemNum = 4;
+  await prj02Pt11.dropItem(itemNum);
+});
+
+test("TC0104 - From Section 11, drag and drop item 1 + 2", async ({ page }) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt11.navigate();
+  });
+  let headerLocator = page.getByRole("heading", {
+    name: "11. Drag and Drop",
+  });
+
+  await prj02Pt11.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 11 - Drag and Drop",
+  );
+
+  await test.step(`Step 3: Validate Section 11 Header`, async () => {
+    await expect(headerLocator).toHaveText("11. Drag and Drop");
+  });
+
+  let itemNum1 = 1;
+  let itemNum2 = 2;
+  await prj02Pt11.dropItem(itemNum1);
+  await prj02Pt11.dropItem(itemNum2);
+});
+
+test("TC0105 - From Section 11, drag and drop item 1, 2, 3", async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt11.navigate();
+  });
+  let headerLocator = page.getByRole("heading", {
+    name: "11. Drag and Drop",
+  });
+
+  await prj02Pt11.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 11 - Drag and Drop",
+  );
+
+  await test.step(`Step 3: Validate Section 11 Header`, async () => {
+    await expect(headerLocator).toHaveText("11. Drag and Drop");
+  });
+
+  let itemNum1 = 1;
+  let itemNum2 = 2;
+  let itemNum3 = 3;
+  await prj02Pt11.dropItem(itemNum1);
+  await prj02Pt11.dropItem(itemNum2);
+  await prj02Pt11.dropItem(itemNum3);
+});
+
+test("TC0106 - From Section 11, drag and drop all item", async ({ page }) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt11.navigate();
+  });
+  let headerLocator = page.getByRole("heading", {
+    name: "11. Drag and Drop",
+  });
+
+  await prj02Pt11.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 11 - Drag and Drop",
+  );
+
+  await test.step(`Step 3: Validate Section 11 Header`, async () => {
+    await expect(headerLocator).toHaveText("11. Drag and Drop");
+  });
+
+  let itemNum1 = 1;
+  let itemNum2 = 2;
+  let itemNum3 = 3;
+  let itemNum4 = 4;
+  await prj02Pt11.dropItem(itemNum1);
+  await prj02Pt11.dropItem(itemNum2);
+  await prj02Pt11.dropItem(itemNum3);
+  await prj02Pt11.dropItem(itemNum4);
+});
+
+test("TC0107 - From Section 11, drag and drop all item -> Reset Selection", async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt11.navigate();
+  });
+  let headerLocator = page.getByRole("heading", {
+    name: "11. Drag and Drop",
+  });
+
+  await prj02Pt11.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 11 - Drag and Drop",
+  );
+
+  await test.step(`Step 3: Validate Section 11 Header`, async () => {
+    await expect(headerLocator).toHaveText("11. Drag and Drop");
+  });
+
+  let itemNum1 = 1;
+  let itemNum2 = 2;
+  let itemNum3 = 3;
+  let itemNum4 = 4;
+  await prj02Pt11.dropItem(itemNum1);
+  await prj02Pt11.dropItem(itemNum2);
+  await prj02Pt11.dropItem(itemNum3);
+  await prj02Pt11.dropItem(itemNum4);
+
+  await test.step(`Step 6: Click Reset Items`, async () => {
+    await page.click("#btn-reset-drag");
+  });
+
+  await test.step(`Step 7: Validate all items are reset`, async () => {
+    for (let i = 1; i <= 4; i++) {
+      const item = page.locator(`#item${i}`);
+      await expect(item).toBeVisible();
+      await expect(item).toHaveCSS("opacity", "1");
+    }
+  });
+});
+
+const { test, expect } = require("@playwright/test");
+const Project02_HelperClass_pt12 = require("../pages/Project02_HelperClass_pt12");
+
+let prj02Pt12;
+
+test.beforeEach(async ({ page }) => {
+  prj02Pt12 = new Project02_HelperClass_pt12(page);
+});
+
+test("TC108 - From Section 12, validate field header", async ({ page }) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt12.navigate();
+  });
+  let headerLocator = page.getByRole("heading", {
+    name: "12. File Upload",
+  });
+  await prj02Pt12.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 12 - File Upload",
+  );
+
+  await test.step(`Step 3: Validate Section 12 Header`, async () => {
+    await expect(headerLocator).toHaveText("12. File Upload");
+  });
+});
+
+test("TC109 - From Section 12, validate sub field header - Upload File", async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt12.navigate();
+  });
+  let headerLocator = page.getByRole("heading", {
+    name: "12. File Upload",
+  });
+  await prj02Pt12.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 12 - File Upload",
+  );
+
+  await test.step(`Step 3: Validate Section 12 Header`, async () => {
+    await expect(headerLocator).toHaveText("12. File Upload");
+  });
+
+  const locatorLabel = "file-upload";
+  const expectedText = "Upload File:";
+  await prj02Pt12.validateSubHeader(locatorLabel, expectedText);
+});
+
+test("TC110 - From Section 12, validate sub field header - Upload Multiple Files", async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt12.navigate();
+  });
+  let headerLocator = page.getByRole("heading", {
+    name: "12. File Upload",
+  });
+  await prj02Pt12.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 12 - File Upload",
+  );
+
+  await test.step(`Step 3: Validate Section 12 Header`, async () => {
+    await expect(headerLocator).toHaveText("12. File Upload");
+  });
+
+  const locatorLabel = "file-upload-multiple";
+  const expectedText = "Upload Multiple Files:";
+  await prj02Pt12.validateSubHeader(locatorLabel, expectedText);
+});
+
+test("TC111 - From Section 12, Upload Single Files", async ({ page }) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt12.navigate();
+  });
+  let headerLocator = page.getByRole("heading", {
+    name: "12. File Upload",
+  });
+  await prj02Pt12.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 12 - File Upload",
+  );
+
+  await test.step(`Step 3: Validate Section 12 Header`, async () => {
+    await expect(headerLocator).toHaveText("12. File Upload");
+  });
+
+  const pathLocation = "D:/Kevin/Resume/Jobs/Cognizant/Client/MOH/";
+  const fileUploadLocation = pathLocation + "MOH_KT_Public_Portal.docx";
+  const fileName = "MOH_KT_Public_Portal";
+  await prj02Pt12.uploadSingleFile(fileUploadLocation, fileName);
+});
+
+test("TC112 - From Section 12, Upload Multiple Files", async ({ page }) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt12.navigate();
+  });
+  let headerLocator = page.getByRole("heading", {
+    name: "12. File Upload",
+  });
+  await prj02Pt12.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 12 - File Upload",
+  );
+
+  await test.step(`Step 3: Validate Section 12 Header`, async () => {
+    await expect(headerLocator).toHaveText("12. File Upload");
+  });
+
+  const pathLocation = "D:/Kevin/Resume/Jobs/Cognizant/Client/MOH/";
+  const file1 = pathLocation + "CurrentRole.png";
+  const fileName1 = "CurrentRole";
+  const file2 = pathLocation + "MOH_KT_Public_Portal.docx";
+  const fileName2 = "MOH_KT_Public_Portal";
+  const file3 = pathLocation + "MOH_KT_WebService.docx";
+  const fileName3 = "MOH_KT_WebService";
+  await prj02Pt12.uploadMultipleFiles(
+    file1,
+    fileName1,
+    file2,
+    fileName2,
+    file3,
+    fileName3,
+  );
+});
+
+const { test, expect } = require("@playwright/test");
+const Project02_HelperClass_pt13 = require("../pages/Project02_HelperClass_pt13");
+
+let prj02Pt13;
+
+test.beforeEach(async ({ page }) => {
+  prj02Pt13 = new Project02_HelperClass_pt13(page);
+});
+
+test("TC113 - From Section 13, validate field header", async ({ page }) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt13.navigate();
+  });
+  let headerLocator = page.getByRole("heading", {
+    name: "13. File Download",
+  });
+  await prj02Pt13.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 13 - File Download",
+  );
+
+  await test.step(`Step 3: Validate Section 13 Header`, async () => {
+    await expect(headerLocator).toHaveText("13. File Download");
+  });
+});
+
+test("TC114 - From Section 13, validate downloaded text file", async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt13.navigate();
+  });
+  let headerLocator = page.getByRole("heading", {
+    name: "13. File Download",
+  });
+  await prj02Pt13.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 13 - File Download",
+  );
+
+  await test.step(`Step 3: Validate Section 13 Header`, async () => {
+    await expect(headerLocator).toHaveText("13. File Download");
+  });
+
+  let download;
+
+  await test.step(`Step 4 + 5: Trigger and capture download`, async () => {
+    const [dl] = await Promise.all([
+      page.waitForEvent("download"),
+      page.click("#btn-download-txt"),
+    ]);
+
+    download = dl;
+  });
+
+  await test.step(`Step 6: Validate downloaded file content`, async () => {
+    const filePath = await download.path();
+
+    const fs = require("fs");
+
+    const fileContent = fs.readFileSync(filePath, "utf-8");
+
+    await expect(fileContent).toContain(
+      "This is a sample text file for automation testing.",
+    );
+
+    await expect(fileContent).toContain("Line 2");
+    await expect(fileContent).toContain("Line 3");
+  });
+});
+
+test("TC115 - From Section 13, validate downloaded csv file", async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt13.navigate();
+  });
+  let headerLocator = page.getByRole("heading", {
+    name: "13. File Download",
+  });
+  await prj02Pt13.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 13 - File Download",
+  );
+
+  await test.step(`Step 3: Validate Section 13 Header`, async () => {
+    await expect(headerLocator).toHaveText("13. File Download");
+  });
+
+  let download;
+
+  await test.step(`Step 4 & 5: Download CSV file`, async () => {
+    const [dl] = await Promise.all([
+      page.waitForEvent("download"),
+      page.click("#btn-download-csv"),
+    ]);
+
+    download = dl;
+  });
+
+  await test.step(`Step 6: Validate CSV content`, async () => {
+    const fs = require("fs");
+
+    const filePath = await download.path();
+
+    const content = fs.readFileSync(filePath, "utf-8");
+
+    const rows = content.split("\n").map((r) => r.trim());
+    const data = rows.map((row) => row.split(","));
+
+    await expect(data[0][0]).toBe("Name");
+    await expect(data[0][1]).toBe("Age");
+    await expect(data[0][2]).toBe("Email");
+
+    await expect(data[1][0]).toBe("John Doe");
+    await expect(Number(data[1][1])).toBe(30);
+    await expect(data[1][2]).toBe("john@example.com");
+
+    await expect(data[2][0]).toBe("Jane Smith");
+    await expect(Number(data[2][1])).toBe(25);
+    await expect(data[2][2]).toBe("jane@example.com");
+  });
+});
+
+test("TC116 - From Section 13, validate downloaded json file", async ({
+  page,
+}) => {
+  await test.step(`Step 1: Navigate to Automation Testing Practice Page`, async () => {
+    await prj02Pt13.navigate();
+  });
+  let headerLocator = page.getByRole("heading", {
+    name: "13. File Download",
+  });
+  await prj02Pt13.scrollToSection(
+    headerLocator,
+    "2: Scroll down to Section 13 - File Download",
+  );
+
+  await test.step(`Step 3: Validate Section 13 Header`, async () => {
+    await expect(headerLocator).toHaveText("13. File Download");
+  });
+
+  let download;
+
+  await test.step(`Step 4 + 5: Download JSON file`, async () => {
+    const [dl] = await Promise.all([
+      page.waitForEvent("download"),
+      page.click("#btn-download-json"),
+    ]);
+
+    download = dl;
+  });
+
+  await test.step(`Step 6: Extract and attach JSON`, async () => {
+    const fs = require("fs");
+
+    const filePath = await download.path();
+
+    const fileContent = fs.readFileSync(filePath, "utf-8");
+
+    const jsonData = JSON.parse(fileContent);
+
+    await test.info().attach("Downloaded JSON", {
+      body: JSON.stringify(jsonData, null, 2),
+      contentType: "application/json",
+    });
+  });
+
+  await test.step(`Step 7: Validate JSON content`, async () => {
+    const fs = require("fs");
+
+    const filePath = await download.path();
+    const jsonData = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+
+    await expect(jsonData.users[0].name).toBe("John Doe");
+    await expect(jsonData.users[0].age).toBe(30);
+    await expect(jsonData.users[0].email).toBe("john@example.com");
+
+    await expect(jsonData.users[1].name).toBe("Jane Smith");
+    await expect(jsonData.users[1].age).toBe(25);
+    await expect(jsonData.users[1].email).toBe("jane@example.com");
+  });
+});
+
+
+// playwright config
+
+// @ts-check
+import { defineConfig, devices } from "@playwright/test";
+
+/**
+ * Read environment variables from file.
+ * https://github.com/motdotla/dotenv
+ */
+// import dotenv from 'dotenv';
+// import path from 'path';
+// dotenv.config({ path: path.resolve(__dirname, '.env') });
+
+/**
+ * @see https://playwright.dev/docs/test-configuration
+ */
+export default defineConfig({
+  testDir: "./tests",
+  /* Run tests in files in parallel */
+  fullyParallel: true,
+  /* Fail the build on CI if you accidentally left test.only in the source code. */
+  forbidOnly: !!process.env.CI,
+  /* Retry on CI only */
+  retries: process.env.CI ? 2 : 0,
+  /* Opt out of parallel tests on CI. */
+  workers: process.env.CI ? 1 : undefined,
+  /* Reporter to use. See https://playwright.dev/docs/test-reporters */
+  reporter: [["html"], ["allure-playwright"]],
+  /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
+  use: {
+    headless: true,
+    screenshot: "on",
+    video: "on",
+    trace: "on-first-retry",
+  },
+
+  /* Configure projects for major browsers */
+  projects: [
+    {
+      name: "Google Chrome",
+      use: {
+        browserName: "chromium",
+        channel: "chrome",
+      },
+    },
+  ],
+
+  /* Run your local dev server before starting the tests */
+  // webServer: {
+  //   command: 'npm run start',
+  //   url: 'http://localhost:3000',
+  //   reuseExistingServer: !process.env.CI,
+  // },
+});
+
+
