@@ -1,0 +1,2067 @@
+// Helper Class
+
+const { test, expect } = require("@playwright/test");
+
+class Project03_HelperClass_pt01 {
+  constructor(page) {
+    this.page = page;
+  }
+  async navigateWebsiteScrollToSection(sectionLocator) {
+    await test.step("Step 1: Navigate to CURA Healthcare Service website", async () => {
+      await this.page.goto("https://katalon-demo-cura.herokuapp.com/");
+    });
+
+    await test.step("Step 2: Scroll to section", async () => {
+      await sectionLocator.scrollIntoViewIfNeeded();
+    });
+  }
+  async verifyHeaderLocator(headerLocation, headerTextResult) {
+    await test.step(`Step 3: Verify page loaded successfully with correct ${headerLocation} heading`, async () => {
+      const heading = this.page.locator(headerLocation);
+      await expect(heading).toHaveText(headerTextResult);
+    });
+  }
+  async verifyLiLocator(liLocator, expectedResult, liTestStep) {
+    await test.step(`Step 3 Validate the li contents - ${liTestStep}`, async () => {
+      await expect(liLocator).toContainText(expectedResult);
+    });
+  }
+  async verifyIconVisibility(iconLocator, iconName) {
+    await test.step(`Step 3: Verify ${iconName} icon is displayed`, async () => {
+      await expect(iconLocator).toBeVisible;
+    });
+  }
+  async clickHamburgerMenu() {
+    await test.step("Step 1: Navigate to CURA Healthcare Service website", async () => {
+      await this.page.goto("https://katalon-demo-cura.herokuapp.com/");
+    });
+
+    await test.step("Step 2: Click on side menu (hamburger icon)", async () => {
+      const menuIcon = this.page.locator("i.fa.fa-bars");
+      await menuIcon.click();
+    });
+  }
+  async verifySidePanelHyperlinks(locatorAttribute, locatorText) {
+    await test.step("Step 3: Verify hyperlink locator'", async () => {
+      const navLink = this.page.locator("a", { hasText: locatorText });
+
+      await expect(navLink).toHaveAttribute("href", locatorAttribute);
+    });
+
+    await test.step(`Step 4: Verify link text is "${locatorText}"`, async () => {
+      const navLink = this.page.locator("a", { hasText: locatorText });
+
+      await expect(navLink).toHaveText(locatorText);
+    });
+  }
+  async checkUserNavigationLogin(headingType, headingWord) {
+    await test.step("Step 4: Verify Login page header", async () => {
+      const loginHeader = this.page.locator(headingType);
+      await expect(loginHeader).toHaveText(headingWord);
+    });
+  }
+}
+
+module.exports = Project03_HelperClass_pt01;
+
+
+const { test, expect } = require("@playwright/test");
+
+class Project03_HelperClass_pt02 {
+  constructor(page) {
+    this.page = page;
+  }
+
+  async navigateWebsiteNavigatetoLogin() {
+    await test.step("Step 1: Navigate to CURA Healthcare Service website", async () => {
+      await this.page.goto("https://katalon-demo-cura.herokuapp.com/");
+    });
+
+    const btnLocator = this.page.locator("#btn-make-appointment");
+    await test.step("Step 2: Click Make Appointment button", async () => {
+      await btnLocator.click();
+    });
+  }
+  async verifyHeaderLocator(headerLocation, headerTextResult) {
+    await test.step(`Step 3: Verify page loaded successfully with correct ${headerLocation} heading`, async () => {
+      const heading = this.page.locator(headerLocation);
+      await expect(heading).toHaveText(headerTextResult);
+    });
+  }
+}
+
+module.exports = Project03_HelperClass_pt02;
+
+
+const { test, expect } = require("@playwright/test");
+
+class Project03_HelperClass_pt03 {
+  constructor(page) {
+    this.page = page;
+  }
+  async loginCURAWebsite() {
+    await test.step("Step 1: Navigate to CURA Healthcare Service login page", async () => {
+      await this.page.goto("https://katalon-demo-cura.herokuapp.com/");
+      const btnLocator = this.page.locator("#btn-make-appointment");
+      await btnLocator.click();
+    });
+  }
+  async verifyHeaderLocator(headerLocation, headerTextResult) {
+    await test.step(`Step 2: Verify user login successfully with correct ${headerLocation} heading`, async () => {
+      const heading = this.page.locator(headerLocation);
+      await expect(heading).toHaveText(headerTextResult);
+    });
+  }
+  async fillUpLoginCredentials() {
+    await test.step("Step 3: User fill up user name + password and click the login button", async () => {
+      await this.page.locator("#txt-username").fill("John Doe");
+      await this.page.locator("#txt-password").fill("ThisIsNotAPassword");
+      await this.page.locator("#btn-login").click();
+    });
+
+    await test.step("Step 4: Verify user login successfully", async () => {
+      const successHeader = this.page.locator("h2");
+      await expect(successHeader).toHaveText("Make Appointment");
+    });
+  }
+  async verifyAppointmentBooking(
+    comboFacilityValue,
+    hospitalReadmission,
+    healthcareSelection,
+    formattedDate,
+    appointmentComment,
+  ) {
+    await test.step("Step 8: Validate appointment confirmation", async () => {
+      const confirmationHeader = this.page.locator("h2");
+      const infoText = this.page.locator("p.lead");
+
+      await expect(confirmationHeader).toHaveText("Appointment Confirmation");
+      await expect(infoText).toContainText("appointment has been booked");
+    });
+
+    await test.step("Step 9: Verify appointment confirmation details", async () => {
+      await expect(this.page.locator("p.lead")).toHaveText(
+        "Please be informed that your appointment has been booked as following:",
+      );
+
+      await expect(this.page.locator("#facility")).toHaveText(
+        comboFacilityValue,
+      );
+      await expect(this.page.locator("#hospital_readmission")).toHaveText(
+        hospitalReadmission,
+      );
+      await expect(this.page.locator("#program")).toHaveText(
+        healthcareSelection,
+      );
+      await expect(this.page.locator("#visit_date")).toHaveText(formattedDate);
+      await expect(this.page.locator("#comment")).toHaveText(
+        appointmentComment,
+      );
+    });
+  }
+  computeRandDate() {
+    const start = new Date(2025, 0, 1);
+    const end = new Date(2026, 4, 31);
+    const randomDate = new Date(
+      start.getTime() + Math.random() * (end.getTime() - start.getTime()),
+    );
+
+    const day = String(randomDate.getDate()).padStart(2, "0");
+    const month = String(randomDate.getMonth() + 1).padStart(2, "0");
+    const year = randomDate.getFullYear();
+    let formattedDate = `${day}/${month}/${year}`;
+    return formattedDate;
+  }
+  async fillUpApplicationForm(
+    comboFacilityValue,
+    healthcareSelection,
+    hospitalReadmission,
+    formattedDate,
+    appointmentComment,
+  ) {
+    await test.step("Step 5: Select facility", async () => {
+      await this.page
+        .locator("#combo_facility")
+        .selectOption(comboFacilityValue);
+    });
+    await test.step("Step 6: Validate checkbox, radio, and set date", async () => {
+      const readmissionCheckbox = this.page.locator(
+        "#chk_hospotal_readmission",
+      );
+
+      const radioMap = {
+        Medicare: "#radio_program_medicare",
+        Medicaid: "#radio_program_medicaid",
+        None: "#radio_program_none",
+      };
+
+      const healthcareRadio = this.page.locator(radioMap[healthcareSelection]);
+
+      await healthcareRadio.check();
+      await expect(healthcareRadio).toBeChecked();
+
+      const dateInput = this.page.locator("#txt_visit_date");
+
+      if (hospitalReadmission === "Yes") {
+        if (!(await readmissionCheckbox.isChecked())) {
+          await readmissionCheckbox.check();
+        }
+      } else {
+        if (await readmissionCheckbox.isChecked()) {
+          await readmissionCheckbox.uncheck();
+        }
+      }
+
+      await expect(readmissionCheckbox).toHaveJSProperty(
+        "checked",
+        hospitalReadmission === "Yes",
+      );
+
+      await dateInput.click();
+      await dateInput.fill("");
+      await dateInput.type(formattedDate);
+      await expect(dateInput).toHaveValue(formattedDate);
+    });
+    await test.step("Step 7: Enter comment and submit", async () => {
+      await this.page.locator("#txt_comment").fill(appointmentComment);
+      await this.page.locator("#btn-book-appointment").click();
+    });
+  }
+}
+
+module.exports = Project03_HelperClass_pt03;
+
+const { test, expect } = require("@playwright/test");
+
+class Project03_HelperClass_pt04 {
+  constructor(page) {
+    this.page = page;
+  }
+  async loginCURAWebsite() {
+    await test.step("Step 1: Navigate to CURA Healthcare Service login page", async () => {
+      await this.page.goto("https://katalon-demo-cura.herokuapp.com/");
+      const btnLocator = this.page.locator("#btn-make-appointment");
+      await btnLocator.click();
+    });
+  }
+  async verifyHeaderLocator(headerLocation, headerTextResult) {
+    await test.step(`Step 2: Verify user login successfully with correct ${headerLocation} heading`, async () => {
+      const heading = this.page.locator(headerLocation);
+      await expect(heading).toHaveText(headerTextResult);
+    });
+  }
+  async fillUpLoginCredentials() {
+    await test.step("Step 3: User fill up user name + password and click the login button", async () => {
+      await this.page.locator("#txt-username").fill("John Doe");
+      await this.page.locator("#txt-password").fill("ThisIsNotAPassword");
+      await this.page.locator("#btn-login").click();
+    });
+
+    await test.step("Step 4: Verify user login successfully", async () => {
+      const successHeader = this.page.locator("h2");
+      await expect(successHeader).toHaveText("Make Appointment");
+    });
+  }
+  async verifyAppointmentBooking(
+    comboFacilityValue,
+    hospitalReadmission,
+    healthcareSelection,
+    formattedDate,
+    appointmentComment,
+  ) {
+    await test.step("Step 8: Validate appointment confirmation", async () => {
+      const confirmationHeader = this.page.locator("h2");
+      const infoText = this.page.locator("p.lead");
+
+      await expect(confirmationHeader).toHaveText("Appointment Confirmation");
+      await expect(infoText).toContainText("appointment has been booked");
+    });
+
+    await test.step("Step 9: Verify appointment confirmation details", async () => {
+      await expect(this.page.locator("p.lead")).toHaveText(
+        "Please be informed that your appointment has been booked as following:",
+      );
+
+      await expect(this.page.locator("#facility")).toHaveText(
+        comboFacilityValue,
+      );
+      await expect(this.page.locator("#hospital_readmission")).toHaveText(
+        hospitalReadmission,
+      );
+      await expect(this.page.locator("#program")).toHaveText(
+        healthcareSelection,
+      );
+      await expect(this.page.locator("#visit_date")).toHaveText(formattedDate);
+      await expect(this.page.locator("#comment")).toHaveText(
+        appointmentComment,
+      );
+    });
+  }
+  computeRandDate() {
+    const start = new Date(2025, 0, 1);
+    const end = new Date(2026, 4, 31);
+    const randomDate = new Date(
+      start.getTime() + Math.random() * (end.getTime() - start.getTime()),
+    );
+
+    const day = String(randomDate.getDate()).padStart(2, "0");
+    const month = String(randomDate.getMonth() + 1).padStart(2, "0");
+    const year = randomDate.getFullYear();
+    let formattedDate = `${day}/${month}/${year}`;
+    return formattedDate;
+  }
+  async fillUpApplicationForm(
+    comboFacilityValue,
+    healthcareSelection,
+    hospitalReadmission,
+    formattedDate,
+    appointmentComment,
+  ) {
+    await test.step("Step 5: Select facility", async () => {
+      await this.page
+        .locator("#combo_facility")
+        .selectOption(comboFacilityValue);
+    });
+    await test.step("Step 6: Validate checkbox, radio, and set date", async () => {
+      const readmissionCheckbox = this.page.locator(
+        "#chk_hospotal_readmission",
+      );
+
+      const radioMap = {
+        Medicare: "#radio_program_medicare",
+        Medicaid: "#radio_program_medicaid",
+        None: "#radio_program_none",
+      };
+
+      const healthcareRadio = this.page.locator(radioMap[healthcareSelection]);
+
+      await healthcareRadio.check();
+      await expect(healthcareRadio).toBeChecked();
+
+      const dateInput = this.page.locator("#txt_visit_date");
+
+      if (hospitalReadmission === "Yes") {
+        if (!(await readmissionCheckbox.isChecked())) {
+          await readmissionCheckbox.check();
+        }
+      } else {
+        if (await readmissionCheckbox.isChecked()) {
+          await readmissionCheckbox.uncheck();
+        }
+      }
+
+      await expect(readmissionCheckbox).toHaveJSProperty(
+        "checked",
+        hospitalReadmission === "Yes",
+      );
+
+      await dateInput.click();
+      await dateInput.fill("");
+      await dateInput.type(formattedDate);
+      await expect(dateInput).toHaveValue(formattedDate);
+    });
+    await test.step("Step 7: Enter comment and submit", async () => {
+      await this.page.locator("#txt_comment").fill(appointmentComment);
+      await this.page.locator("#btn-book-appointment").click();
+    });
+  }
+  async verifyAppointmentHistoryBooking(
+    formattedDate,
+    comboFacilityValue,
+    hospitalReadmission,
+    healthcareSelection,
+    appointmentComment,
+  ) {
+    await test.step("Step 10: Navigate to History page via side menu", async () => {
+      await this.page.locator("i.fa.fa-bars").click();
+      await this.page.locator("a", { hasText: "History" }).click();
+    });
+
+    await test.step("Step 11: Validate Appointment History page details", async () => {
+      await expect(this.page.locator("h2")).toHaveText("History");
+      await expect(this.page.locator(".panel-heading")).toHaveText(
+        formattedDate,
+      );
+      await expect(this.page.locator("#facility")).toHaveText(
+        comboFacilityValue,
+      );
+      await expect(this.page.locator("#hospital_readmission")).toHaveText(
+        hospitalReadmission,
+      );
+      await expect(this.page.locator("#program")).toHaveText(
+        healthcareSelection,
+      );
+      await expect(this.page.locator("#comment")).toHaveText(
+        appointmentComment,
+      );
+    });
+  }
+}
+
+module.exports = Project03_HelperClass_pt04;
+
+// Tests
+const { test, expect } = require("@playwright/test");
+const Project03_HelperClass_pt01 = require("../pages/Project03_HelperClass_pt01");
+
+let prj03Pt01;
+test.beforeEach(async ({ page }) => {
+  prj03Pt01 = new Project03_HelperClass_pt01(page);
+});
+
+test("TC001 - Verify navigation to CURA Healthcare Service", async ({
+  page,
+}) => {
+  const sectionLocator = page.locator("h1");
+  await prj03Pt01.navigateWebsiteScrollToSection(sectionLocator);
+  const headerLocation = "h1";
+  const headerTextResult = "CURA Healthcare Service";
+  await prj03Pt01.verifyHeaderLocator(headerLocation, headerTextResult);
+});
+
+test("TC002 - Verify sub header contents - h3", async ({ page }) => {
+  const sectionLocator = page.locator("h3");
+  await prj03Pt01.navigateWebsiteScrollToSection(sectionLocator);
+  const headerLocation = "h3";
+  const headerTextResult = "We Care About Your Health";
+  await prj03Pt01.verifyHeaderLocator(headerLocation, headerTextResult);
+});
+
+test("TC003 - Verify sub header contents - h4", async ({ page }) => {
+  const sectionLocator = page.locator("h4");
+  await prj03Pt01.navigateWebsiteScrollToSection(sectionLocator);
+  const headerLocation = "h4";
+  const headerTextResult = "CURA Healthcare Service";
+  await prj03Pt01.verifyHeaderLocator(headerLocation, headerTextResult);
+});
+
+test("TC004 - Verify paragraph contents - address", async ({ page }) => {
+  const sectionLocator = page.locator("p", {
+    hasText: "Atlanta 550 Pharr Road NE Suite 525",
+  });
+  await prj03Pt01.navigateWebsiteScrollToSection(sectionLocator);
+  await test.step("Step 3: Validate address paragraph", async () => {
+    await expect(sectionLocator).toContainText(
+      "Atlanta 550 Pharr Road NE Suite 525",
+    );
+
+    await expect(sectionLocator).toContainText("Atlanta, GA 30305");
+  });
+});
+
+test("TC005 - Verify li contents - phone number", async ({ page }) => {
+  const liLocator = page.locator("li", {
+    has: page.locator("i.fa-phone"),
+  });
+  const liTestStep = "phone number";
+  const expectedResult = "(678) 813-1KMS";
+
+  await prj03Pt01.navigateWebsiteScrollToSection(liLocator);
+
+  await prj03Pt01.verifyLiLocator(liLocator, expectedResult, liTestStep);
+});
+
+test("TC006 - Verify hyperlink contents - email", async ({ page }) => {
+  const linkLocator = page.locator('a[href="mailto:info@katalon.com"]');
+  await prj03Pt01.navigateWebsiteScrollToSection(linkLocator);
+
+  await test.step(`Step 3:  Validate the hyperlink is linked correctly`, async () => {
+    await expect(linkLocator).toHaveAttribute(
+      "href",
+      "mailto:info@katalon.com",
+    );
+    await expect(linkLocator).toHaveText("info@katalon.com");
+  });
+});
+
+test("TC007 - Verify icons display - Facebook", async ({ page }) => {
+  const iconLocator = page.locator("i.fa-facebook");
+  const iconName = "Facebook";
+  await prj03Pt01.navigateWebsiteScrollToSection(iconLocator);
+
+  await prj03Pt01.verifyIconVisibility(iconLocator, iconName);
+});
+
+test("TC008 - Verify icons display - Twitter", async ({ page }) => {
+  const iconLocator = page.locator("i.fa-twitter");
+  const iconName = "Twitter";
+  await prj03Pt01.navigateWebsiteScrollToSection(iconLocator);
+
+  await prj03Pt01.verifyIconVisibility(iconLocator, iconName);
+});
+
+test("TC009 - Verify icons display - Dribble", async ({ page }) => {
+  const iconLocator = page.locator("i.fa-dribbble");
+  const iconName = "Dribble";
+  await prj03Pt01.navigateWebsiteScrollToSection(iconLocator);
+
+  await prj03Pt01.verifyIconVisibility(iconLocator, iconName);
+});
+
+test("TC010 - Verify paragraph contents - copyrights", async ({ page }) => {
+  const sectionLocator = page.locator("p", {
+    hasText: "Copyright © CURA Healthcare Service 2026",
+  });
+  await prj03Pt01.navigateWebsiteScrollToSection(sectionLocator);
+  await test.step("Step 3: Validate copyright paragraph", async () => {
+    await expect(sectionLocator).toContainText(
+      "Copyright © CURA Healthcare Service 2026",
+    );
+  });
+});
+
+test("TC011 - Verify side panel - Header", async ({ page }) => {
+  await prj03Pt01.clickHamburgerMenu();
+
+  await test.step("Step 3: Verify side panel header", async () => {
+    const headerLink = page.locator("a", { hasText: "CURA Healthcare" });
+    await expect(headerLink).toHaveText("CURA Healthcare");
+  });
+});
+
+test("TC012 - Verify side panel - Home", async ({ page }) => {
+  await prj03Pt01.clickHamburgerMenu();
+  const locatorAttribute = "./";
+  const locatorText = "Home";
+  await prj03Pt01.verifySidePanelHyperlinks(locatorAttribute, locatorText);
+});
+
+test("TC013 - Verify side panel - Login", async ({ page }) => {
+  await prj03Pt01.clickHamburgerMenu();
+  const locatorAttribute = "profile.php#login";
+  const locatorText = "Login";
+  await prj03Pt01.verifySidePanelHyperlinks(locatorAttribute, locatorText);
+});
+
+test("TC014 - Verify Login Navigation - click Button", async ({ page }) => {
+  const sectionLocator = page.locator("#btn-make-appointment");
+  await prj03Pt01.navigateWebsiteScrollToSection(sectionLocator);
+
+  await test.step("Step 3: Click Make Appointment button", async () => {
+    await sectionLocator.click();
+  });
+
+  const headingType = "h2";
+  const headingWord = "Login";
+  await prj03Pt01.checkUserNavigationLogin(headingType, headingWord);
+});
+
+test("TC015 - Verify Login Navigation - side panel login", async ({ page }) => {
+  await prj03Pt01.clickHamburgerMenu();
+  const navLink = page.locator("a", { hasText: "Login" });
+
+  await test.step("Step 3: Click Login", async () => {
+    await navLink.click();
+  });
+
+  const headingType = "h2";
+  const headingWord = "Login";
+  await prj03Pt01.checkUserNavigationLogin(headingType, headingWord);
+});
+
+
+const { test, expect } = require("@playwright/test");
+const Project03_HelperClass_pt02 = require("../pages/Project03_HelperClass_pt02");
+
+let prj03Pt02;
+test.beforeEach(async ({ page }) => {
+  prj03Pt02 = new Project03_HelperClass_pt02(page);
+});
+
+test("TC016 - Verify navigation to CURA Healthcare Service Login Page", async ({
+  page,
+}) => {
+  await prj03Pt02.navigateWebsiteNavigatetoLogin();
+  const headerLocation = "h2";
+  const headerTextResult = "Login";
+  await prj03Pt02.verifyHeaderLocator(headerLocation, headerTextResult);
+});
+
+test("TC017 - Verify successful login to CURA Healthcare Service", async ({
+  page,
+}) => {
+  await prj03Pt02.navigateWebsiteNavigatetoLogin();
+  const headerLocation = "h2";
+  const headerTextResult = "Login";
+  await prj03Pt02.verifyHeaderLocator(headerLocation, headerTextResult);
+
+  await test.step("Step 4: Enter Username", async () => {
+    await page.locator("#txt-username").fill("John Doe");
+  });
+
+  await test.step("Step 5: Enter Password", async () => {
+    await page.locator("#txt-password").fill("ThisIsNotAPassword");
+  });
+
+  await test.step("Step 6: Click login button", async () => {
+    await page.locator("#btn-login").click();
+  });
+
+  await test.step("Step 7: Handle browser save password popup (if any)", async () => {
+    // No action needed in Playwright (browser-level popup is ignored by default)
+  });
+
+  await test.step("Step 8: Verify successful login", async () => {
+    const successHeader = page.locator("h2");
+    await expect(successHeader).toHaveText("Make Appointment");
+  });
+});
+
+test("TC018 - Verify unsuccessful login to CURA Healthcare Service", async ({
+  page,
+}) => {
+  await prj03Pt02.navigateWebsiteNavigatetoLogin();
+  const headerLocation = "h2";
+  const headerTextResult = "Login";
+  await prj03Pt02.verifyHeaderLocator(headerLocation, headerTextResult);
+
+  await test.step("Step 4: Enter Username", async () => {
+    await page.locator("#txt-username").fill("John Doe");
+  });
+
+  await test.step("Step 5: Enter Password", async () => {
+    await page.locator("#txt-password").fill("WrongPassword");
+  });
+
+  await test.step("Step 6: Click login button", async () => {
+    await page.locator("#btn-login").click();
+  });
+
+  await test.step("Step 7: Verify error message is displayed when user login unsuccessfully", async () => {
+    const errorMessage = page.locator("p.lead.text-danger");
+    await expect(errorMessage).toHaveText(
+      "Login failed! Please ensure the username and password are valid.",
+    );
+  });
+});
+
+const { test, expect } = require("@playwright/test");
+const Project03_HelperClass_pt03 = require("../pages/Project03_HelperClass_pt03");
+
+let prj03Pt03;
+test.beforeEach(async ({ page }) => {
+  prj03Pt03 = new Project03_HelperClass_pt03(page);
+});
+
+test("TC019 - Verify login to CURA Healthcare Service", async ({ page }) => {
+  await prj03Pt03.loginCURAWebsite();
+
+  const headerLocation = "h2";
+  const headerTextResult = "Login";
+  await prj03Pt03.verifyHeaderLocator(headerLocation, headerTextResult);
+
+  await prj03Pt03.fillUpLoginCredentials();
+});
+
+test("TC020 - Verify application of Medicare - Tokyo CURA Healthcare Center", async ({
+  page,
+}) => {
+  await prj03Pt03.loginCURAWebsite();
+
+  const headerLocation = "h2";
+  const headerTextResult = "Login";
+  await prj03Pt03.verifyHeaderLocator(headerLocation, headerTextResult);
+
+  await prj03Pt03.fillUpLoginCredentials();
+
+  let formattedDate = prj03Pt03.computeRandDate();
+  const comboFacilityValue = "Tokyo CURA Healthcare Center";
+  const hospitalReadmission = "No";
+  const healthcareSelection = "Medicare";
+  const appointmentComment = healthcareSelection + " Appointment Booking";
+
+  await prj03Pt03.fillUpApplicationForm(
+    comboFacilityValue,
+    healthcareSelection,
+    hospitalReadmission,
+    formattedDate,
+    appointmentComment,
+  );
+
+  await prj03Pt03.verifyAppointmentBooking(
+    comboFacilityValue,
+    hospitalReadmission,
+    healthcareSelection,
+    formattedDate,
+    appointmentComment,
+  );
+});
+
+test("TC021 - Verify application of Medicare - Hongkong CURA Healthcare Center", async ({
+  page,
+}) => {
+  await prj03Pt03.loginCURAWebsite();
+
+  const headerLocation = "h2";
+  const headerTextResult = "Login";
+  await prj03Pt03.verifyHeaderLocator(headerLocation, headerTextResult);
+
+  await prj03Pt03.fillUpLoginCredentials();
+
+  let formattedDate = prj03Pt03.computeRandDate();
+  const comboFacilityValue = "Hongkong CURA Healthcare Center";
+  const hospitalReadmission = "No";
+  const healthcareSelection = "Medicare";
+  const appointmentComment = healthcareSelection + " Appointment Booking";
+
+  await prj03Pt03.fillUpApplicationForm(
+    comboFacilityValue,
+    healthcareSelection,
+    hospitalReadmission,
+    formattedDate,
+    appointmentComment,
+  );
+
+  await prj03Pt03.verifyAppointmentBooking(
+    comboFacilityValue,
+    hospitalReadmission,
+    healthcareSelection,
+    formattedDate,
+    appointmentComment,
+  );
+});
+
+test("TC022 - Verify application of Medicare - Seoul CURA Healthcare Center", async ({
+  page,
+}) => {
+  await prj03Pt03.loginCURAWebsite();
+
+  const headerLocation = "h2";
+  const headerTextResult = "Login";
+  await prj03Pt03.verifyHeaderLocator(headerLocation, headerTextResult);
+
+  await prj03Pt03.fillUpLoginCredentials();
+
+  let formattedDate = prj03Pt03.computeRandDate();
+  const comboFacilityValue = "Seoul CURA Healthcare Center";
+  const hospitalReadmission = "No";
+  const healthcareSelection = "Medicare";
+  const appointmentComment = healthcareSelection + " Appointment Booking";
+
+  await prj03Pt03.fillUpApplicationForm(
+    comboFacilityValue,
+    healthcareSelection,
+    hospitalReadmission,
+    formattedDate,
+    appointmentComment,
+  );
+
+  await prj03Pt03.verifyAppointmentBooking(
+    comboFacilityValue,
+    hospitalReadmission,
+    healthcareSelection,
+    formattedDate,
+    appointmentComment,
+  );
+});
+
+test("TC023 - Medicare Application - Tokyo CURA Healthcare Center + readmission = 'Y'", async ({
+  page,
+}) => {
+  await prj03Pt03.loginCURAWebsite();
+
+  const headerLocation = "h2";
+  const headerTextResult = "Login";
+  await prj03Pt03.verifyHeaderLocator(headerLocation, headerTextResult);
+
+  await prj03Pt03.fillUpLoginCredentials();
+
+  let formattedDate = prj03Pt03.computeRandDate();
+  const comboFacilityValue = "Tokyo CURA Healthcare Center";
+  const hospitalReadmission = "Yes";
+  const healthcareSelection = "Medicare";
+  const appointmentComment = healthcareSelection + " Appointment Booking";
+
+  await prj03Pt03.fillUpApplicationForm(
+    comboFacilityValue,
+    healthcareSelection,
+    hospitalReadmission,
+    formattedDate,
+    appointmentComment,
+  );
+
+  await prj03Pt03.verifyAppointmentBooking(
+    comboFacilityValue,
+    hospitalReadmission,
+    healthcareSelection,
+    formattedDate,
+    appointmentComment,
+  );
+});
+
+test("TC024 - Medicare Application - Hongkong CURA Healthcare Center + readmission = 'Y'", async ({
+  page,
+}) => {
+  await prj03Pt03.loginCURAWebsite();
+
+  const headerLocation = "h2";
+  const headerTextResult = "Login";
+  await prj03Pt03.verifyHeaderLocator(headerLocation, headerTextResult);
+
+  await prj03Pt03.fillUpLoginCredentials();
+
+  let formattedDate = prj03Pt03.computeRandDate();
+  const comboFacilityValue = "Hongkong CURA Healthcare Center";
+  const hospitalReadmission = "Yes";
+  const healthcareSelection = "Medicare";
+  const appointmentComment = healthcareSelection + " Appointment Booking";
+
+  await prj03Pt03.fillUpApplicationForm(
+    comboFacilityValue,
+    healthcareSelection,
+    hospitalReadmission,
+    formattedDate,
+    appointmentComment,
+  );
+
+  await prj03Pt03.verifyAppointmentBooking(
+    comboFacilityValue,
+    hospitalReadmission,
+    healthcareSelection,
+    formattedDate,
+    appointmentComment,
+  );
+});
+
+test("TC025 - Medicare Application - Seoul CURA Healthcare Center + readmission = 'Y'", async ({
+  page,
+}) => {
+  await prj03Pt03.loginCURAWebsite();
+
+  const headerLocation = "h2";
+  const headerTextResult = "Login";
+  await prj03Pt03.verifyHeaderLocator(headerLocation, headerTextResult);
+
+  await prj03Pt03.fillUpLoginCredentials();
+
+  let formattedDate = prj03Pt03.computeRandDate();
+  const comboFacilityValue = "Seoul CURA Healthcare Center";
+  const hospitalReadmission = "Yes";
+  const healthcareSelection = "Medicare";
+  const appointmentComment = healthcareSelection + " Appointment Booking";
+
+  await prj03Pt03.fillUpApplicationForm(
+    comboFacilityValue,
+    healthcareSelection,
+    hospitalReadmission,
+    formattedDate,
+    appointmentComment,
+  );
+
+  await prj03Pt03.verifyAppointmentBooking(
+    comboFacilityValue,
+    hospitalReadmission,
+    healthcareSelection,
+    formattedDate,
+    appointmentComment,
+  );
+});
+
+test("TC026 - Medicare Application - Tokyo CURA Healthcare Center + readmission = 'N' + Medicaid", async ({
+  page,
+}) => {
+  await prj03Pt03.loginCURAWebsite();
+
+  const headerLocation = "h2";
+  const headerTextResult = "Login";
+  await prj03Pt03.verifyHeaderLocator(headerLocation, headerTextResult);
+
+  await prj03Pt03.fillUpLoginCredentials();
+
+  let formattedDate = prj03Pt03.computeRandDate();
+  const comboFacilityValue = "Tokyo CURA Healthcare Center";
+  const hospitalReadmission = "No";
+  const healthcareSelection = "Medicaid";
+  const appointmentComment = healthcareSelection + " Appointment Booking";
+
+  await prj03Pt03.fillUpApplicationForm(
+    comboFacilityValue,
+    healthcareSelection,
+    hospitalReadmission,
+    formattedDate,
+    appointmentComment,
+  );
+
+  await prj03Pt03.verifyAppointmentBooking(
+    comboFacilityValue,
+    hospitalReadmission,
+    healthcareSelection,
+    formattedDate,
+    appointmentComment,
+  );
+});
+
+test("TC027 - Medicare Application - Hongkong CURA Healthcare Center + readmission = 'N' + Medicaid", async ({
+  page,
+}) => {
+  await prj03Pt03.loginCURAWebsite();
+
+  const headerLocation = "h2";
+  const headerTextResult = "Login";
+  await prj03Pt03.verifyHeaderLocator(headerLocation, headerTextResult);
+
+  await prj03Pt03.fillUpLoginCredentials();
+
+  let formattedDate = prj03Pt03.computeRandDate();
+  const comboFacilityValue = "Hongkong CURA Healthcare Center";
+  const hospitalReadmission = "No";
+  const healthcareSelection = "Medicaid";
+  const appointmentComment = healthcareSelection + " Appointment Booking";
+
+  await prj03Pt03.fillUpApplicationForm(
+    comboFacilityValue,
+    healthcareSelection,
+    hospitalReadmission,
+    formattedDate,
+    appointmentComment,
+  );
+
+  await prj03Pt03.verifyAppointmentBooking(
+    comboFacilityValue,
+    hospitalReadmission,
+    healthcareSelection,
+    formattedDate,
+    appointmentComment,
+  );
+});
+
+test("TC028 - Medicare Application - Seoul CURA Healthcare Center + readmission = 'N' + Medicaid", async ({
+  page,
+}) => {
+  await prj03Pt03.loginCURAWebsite();
+
+  const headerLocation = "h2";
+  const headerTextResult = "Login";
+  await prj03Pt03.verifyHeaderLocator(headerLocation, headerTextResult);
+
+  await prj03Pt03.fillUpLoginCredentials();
+
+  let formattedDate = prj03Pt03.computeRandDate();
+  const comboFacilityValue = "Seoul CURA Healthcare Center";
+  const hospitalReadmission = "No";
+  const healthcareSelection = "Medicaid";
+  const appointmentComment = healthcareSelection + " Appointment Booking";
+
+  await prj03Pt03.fillUpApplicationForm(
+    comboFacilityValue,
+    healthcareSelection,
+    hospitalReadmission,
+    formattedDate,
+    appointmentComment,
+  );
+
+  await prj03Pt03.verifyAppointmentBooking(
+    comboFacilityValue,
+    hospitalReadmission,
+    healthcareSelection,
+    formattedDate,
+    appointmentComment,
+  );
+});
+
+test("TC029 - Medicare Application - Tokyo CURA Healthcare Center + readmission = 'Y' + Medicaid", async ({
+  page,
+}) => {
+  await prj03Pt03.loginCURAWebsite();
+
+  const headerLocation = "h2";
+  const headerTextResult = "Login";
+  await prj03Pt03.verifyHeaderLocator(headerLocation, headerTextResult);
+
+  await prj03Pt03.fillUpLoginCredentials();
+
+  let formattedDate = prj03Pt03.computeRandDate();
+  const comboFacilityValue = "Tokyo CURA Healthcare Center";
+  const hospitalReadmission = "Yes";
+  const healthcareSelection = "Medicaid";
+  const appointmentComment = healthcareSelection + " Appointment Booking";
+
+  await prj03Pt03.fillUpApplicationForm(
+    comboFacilityValue,
+    healthcareSelection,
+    hospitalReadmission,
+    formattedDate,
+    appointmentComment,
+  );
+
+  await prj03Pt03.verifyAppointmentBooking(
+    comboFacilityValue,
+    hospitalReadmission,
+    healthcareSelection,
+    formattedDate,
+    appointmentComment,
+  );
+});
+
+test("TC030 - Medicare Application - Hongkong CURA Healthcare Center + readmission = 'Y' + Medicaid", async ({
+  page,
+}) => {
+  await prj03Pt03.loginCURAWebsite();
+
+  const headerLocation = "h2";
+  const headerTextResult = "Login";
+  await prj03Pt03.verifyHeaderLocator(headerLocation, headerTextResult);
+
+  await prj03Pt03.fillUpLoginCredentials();
+
+  let formattedDate = prj03Pt03.computeRandDate();
+  const comboFacilityValue = "Hongkong CURA Healthcare Center";
+  const hospitalReadmission = "Yes";
+  const healthcareSelection = "Medicaid";
+  const appointmentComment = healthcareSelection + " Appointment Booking";
+
+  await prj03Pt03.fillUpApplicationForm(
+    comboFacilityValue,
+    healthcareSelection,
+    hospitalReadmission,
+    formattedDate,
+    appointmentComment,
+  );
+
+  await prj03Pt03.verifyAppointmentBooking(
+    comboFacilityValue,
+    hospitalReadmission,
+    healthcareSelection,
+    formattedDate,
+    appointmentComment,
+  );
+});
+
+test("TC031 - Medicare Application - Seoul CURA Healthcare Center + readmission = 'Y' + Medicaid", async ({
+  page,
+}) => {
+  await prj03Pt03.loginCURAWebsite();
+
+  const headerLocation = "h2";
+  const headerTextResult = "Login";
+  await prj03Pt03.verifyHeaderLocator(headerLocation, headerTextResult);
+
+  await prj03Pt03.fillUpLoginCredentials();
+
+  let formattedDate = prj03Pt03.computeRandDate();
+  const comboFacilityValue = "Seoul CURA Healthcare Center";
+  const hospitalReadmission = "Yes";
+  const healthcareSelection = "Medicaid";
+  const appointmentComment = healthcareSelection + " Appointment Booking";
+
+  await prj03Pt03.fillUpApplicationForm(
+    comboFacilityValue,
+    healthcareSelection,
+    hospitalReadmission,
+    formattedDate,
+    appointmentComment,
+  );
+
+  await prj03Pt03.verifyAppointmentBooking(
+    comboFacilityValue,
+    hospitalReadmission,
+    healthcareSelection,
+    formattedDate,
+    appointmentComment,
+  );
+});
+
+test("TC032 - Medicare Application - Tokyo CURA Healthcare Center + readmission = 'N' + None", async ({
+  page,
+}) => {
+  await prj03Pt03.loginCURAWebsite();
+
+  const headerLocation = "h2";
+  const headerTextResult = "Login";
+  await prj03Pt03.verifyHeaderLocator(headerLocation, headerTextResult);
+
+  await prj03Pt03.fillUpLoginCredentials();
+
+  let formattedDate = prj03Pt03.computeRandDate();
+  const comboFacilityValue = "Tokyo CURA Healthcare Center";
+  const hospitalReadmission = "No";
+  const healthcareSelection = "None";
+  const appointmentComment = healthcareSelection + " Appointment Booking";
+
+  await prj03Pt03.fillUpApplicationForm(
+    comboFacilityValue,
+    healthcareSelection,
+    hospitalReadmission,
+    formattedDate,
+    appointmentComment,
+  );
+
+  await prj03Pt03.verifyAppointmentBooking(
+    comboFacilityValue,
+    hospitalReadmission,
+    healthcareSelection,
+    formattedDate,
+    appointmentComment,
+  );
+});
+
+test("TC033 - Medicare Application - Hongkong CURA Healthcare Center + readmission = 'N' + None", async ({
+  page,
+}) => {
+  await prj03Pt03.loginCURAWebsite();
+
+  const headerLocation = "h2";
+  const headerTextResult = "Login";
+  await prj03Pt03.verifyHeaderLocator(headerLocation, headerTextResult);
+
+  await prj03Pt03.fillUpLoginCredentials();
+
+  let formattedDate = prj03Pt03.computeRandDate();
+  const comboFacilityValue = "Hongkong CURA Healthcare Center";
+  const hospitalReadmission = "No";
+  const healthcareSelection = "None";
+  const appointmentComment = healthcareSelection + " Appointment Booking";
+
+  await prj03Pt03.fillUpApplicationForm(
+    comboFacilityValue,
+    healthcareSelection,
+    hospitalReadmission,
+    formattedDate,
+    appointmentComment,
+  );
+
+  await prj03Pt03.verifyAppointmentBooking(
+    comboFacilityValue,
+    hospitalReadmission,
+    healthcareSelection,
+    formattedDate,
+    appointmentComment,
+  );
+});
+
+test("TC034 - Medicare Application - Seoul CURA Healthcare Center + readmission = 'N' + None", async ({
+  page,
+}) => {
+  await prj03Pt03.loginCURAWebsite();
+
+  const headerLocation = "h2";
+  const headerTextResult = "Login";
+  await prj03Pt03.verifyHeaderLocator(headerLocation, headerTextResult);
+
+  await prj03Pt03.fillUpLoginCredentials();
+
+  let formattedDate = prj03Pt03.computeRandDate();
+  const comboFacilityValue = "Seoul CURA Healthcare Center";
+  const hospitalReadmission = "No";
+  const healthcareSelection = "None";
+  const appointmentComment = healthcareSelection + " Appointment Booking";
+
+  await prj03Pt03.fillUpApplicationForm(
+    comboFacilityValue,
+    healthcareSelection,
+    hospitalReadmission,
+    formattedDate,
+    appointmentComment,
+  );
+
+  await prj03Pt03.verifyAppointmentBooking(
+    comboFacilityValue,
+    hospitalReadmission,
+    healthcareSelection,
+    formattedDate,
+    appointmentComment,
+  );
+});
+
+test("TC035 - Medicare Application - Tokyo CURA Healthcare Center + readmission = 'Y' + None", async ({
+  page,
+}) => {
+  await prj03Pt03.loginCURAWebsite();
+
+  const headerLocation = "h2";
+  const headerTextResult = "Login";
+  await prj03Pt03.verifyHeaderLocator(headerLocation, headerTextResult);
+
+  await prj03Pt03.fillUpLoginCredentials();
+
+  let formattedDate = prj03Pt03.computeRandDate();
+  const comboFacilityValue = "Tokyo CURA Healthcare Center";
+  const hospitalReadmission = "Yes";
+  const healthcareSelection = "None";
+  const appointmentComment = healthcareSelection + " Appointment Booking";
+
+  await prj03Pt03.fillUpApplicationForm(
+    comboFacilityValue,
+    healthcareSelection,
+    hospitalReadmission,
+    formattedDate,
+    appointmentComment,
+  );
+
+  await prj03Pt03.verifyAppointmentBooking(
+    comboFacilityValue,
+    hospitalReadmission,
+    healthcareSelection,
+    formattedDate,
+    appointmentComment,
+  );
+});
+
+test("TC036 - Medicare Application - Hongkong CURA Healthcare Center + readmission = 'Y' + None", async ({
+  page,
+}) => {
+  await prj03Pt03.loginCURAWebsite();
+
+  const headerLocation = "h2";
+  const headerTextResult = "Login";
+  await prj03Pt03.verifyHeaderLocator(headerLocation, headerTextResult);
+
+  await prj03Pt03.fillUpLoginCredentials();
+
+  let formattedDate = prj03Pt03.computeRandDate();
+  const comboFacilityValue = "Hongkong CURA Healthcare Center";
+  const hospitalReadmission = "Yes";
+  const healthcareSelection = "None";
+  const appointmentComment = healthcareSelection + " Appointment Booking";
+
+  await prj03Pt03.fillUpApplicationForm(
+    comboFacilityValue,
+    healthcareSelection,
+    hospitalReadmission,
+    formattedDate,
+    appointmentComment,
+  );
+
+  await prj03Pt03.verifyAppointmentBooking(
+    comboFacilityValue,
+    hospitalReadmission,
+    healthcareSelection,
+    formattedDate,
+    appointmentComment,
+  );
+});
+
+test("TC037 - Medicare Application - Seoul CURA Healthcare Center + readmission = 'Y' + None", async ({
+  page,
+}) => {
+  await prj03Pt03.loginCURAWebsite();
+
+  const headerLocation = "h2";
+  const headerTextResult = "Login";
+  await prj03Pt03.verifyHeaderLocator(headerLocation, headerTextResult);
+
+  await prj03Pt03.fillUpLoginCredentials();
+
+  let formattedDate = prj03Pt03.computeRandDate();
+  const comboFacilityValue = "Seoul CURA Healthcare Center";
+  const hospitalReadmission = "Yes";
+  const healthcareSelection = "None";
+  const appointmentComment = healthcareSelection + " Appointment Booking";
+
+  await prj03Pt03.fillUpApplicationForm(
+    comboFacilityValue,
+    healthcareSelection,
+    hospitalReadmission,
+    formattedDate,
+    appointmentComment,
+  );
+
+  await prj03Pt03.verifyAppointmentBooking(
+    comboFacilityValue,
+    hospitalReadmission,
+    healthcareSelection,
+    formattedDate,
+    appointmentComment,
+  );
+});
+
+const { test, expect } = require("@playwright/test");
+const Project03_HelperClass_pt04 = require("../pages/Project03_HelperClass_pt04");
+
+let prj03Pt04;
+test.beforeEach(async ({ page }) => {
+  prj03Pt04 = new Project03_HelperClass_pt04(page);
+});
+
+test("TC038 - E2E Flow - Tokyo CURA Healthcare Center | hospitalReadmission = 'N' + Medicare", async ({
+  page,
+}) => {
+  await prj03Pt04.loginCURAWebsite();
+
+  const headerLocation = "h2";
+  const headerTextResult = "Login";
+  await prj03Pt04.verifyHeaderLocator(headerLocation, headerTextResult);
+
+  await prj03Pt04.fillUpLoginCredentials();
+
+  let formattedDate = prj03Pt04.computeRandDate();
+  const comboFacilityValue = "Tokyo CURA Healthcare Center";
+  const hospitalReadmission = "No";
+  const healthcareSelection = "Medicare";
+  const appointmentComment = healthcareSelection + " Appointment Booking";
+
+  await prj03Pt04.fillUpApplicationForm(
+    comboFacilityValue,
+    healthcareSelection,
+    hospitalReadmission,
+    formattedDate,
+    appointmentComment,
+  );
+
+  await prj03Pt04.verifyAppointmentBooking(
+    comboFacilityValue,
+    hospitalReadmission,
+    healthcareSelection,
+    formattedDate,
+    appointmentComment,
+  );
+  await prj03Pt04.verifyAppointmentHistoryBooking(
+    formattedDate,
+    comboFacilityValue,
+    hospitalReadmission,
+    healthcareSelection,
+    appointmentComment,
+  );
+});
+
+test("TC039 - E2E Flow - Hongkong CURA Healthcare Center | hospitalReadmission = 'N' + Medicare", async ({
+  page,
+}) => {
+  await prj03Pt04.loginCURAWebsite();
+
+  const headerLocation = "h2";
+  const headerTextResult = "Login";
+  await prj03Pt04.verifyHeaderLocator(headerLocation, headerTextResult);
+
+  await prj03Pt04.fillUpLoginCredentials();
+
+  let formattedDate = prj03Pt04.computeRandDate();
+  const comboFacilityValue = "Hongkong CURA Healthcare Center";
+  const hospitalReadmission = "No";
+  const healthcareSelection = "Medicare";
+  const appointmentComment = healthcareSelection + " Appointment Booking";
+
+  await prj03Pt04.fillUpApplicationForm(
+    comboFacilityValue,
+    healthcareSelection,
+    hospitalReadmission,
+    formattedDate,
+    appointmentComment,
+  );
+
+  await prj03Pt04.verifyAppointmentBooking(
+    comboFacilityValue,
+    hospitalReadmission,
+    healthcareSelection,
+    formattedDate,
+    appointmentComment,
+  );
+  await prj03Pt04.verifyAppointmentHistoryBooking(
+    formattedDate,
+    comboFacilityValue,
+    hospitalReadmission,
+    healthcareSelection,
+    appointmentComment,
+  );
+});
+
+test("TC040 - E2E Flow - Seoul CURA Healthcare Center | hospitalReadmission = 'N' + Medicare", async ({
+  page,
+}) => {
+  await prj03Pt04.loginCURAWebsite();
+
+  const headerLocation = "h2";
+  const headerTextResult = "Login";
+  await prj03Pt04.verifyHeaderLocator(headerLocation, headerTextResult);
+
+  await prj03Pt04.fillUpLoginCredentials();
+
+  let formattedDate = prj03Pt04.computeRandDate();
+  const comboFacilityValue = "Seoul CURA Healthcare Center";
+  const hospitalReadmission = "No";
+  const healthcareSelection = "Medicare";
+  const appointmentComment = healthcareSelection + " Appointment Booking";
+
+  await prj03Pt04.fillUpApplicationForm(
+    comboFacilityValue,
+    healthcareSelection,
+    hospitalReadmission,
+    formattedDate,
+    appointmentComment,
+  );
+
+  await prj03Pt04.verifyAppointmentBooking(
+    comboFacilityValue,
+    hospitalReadmission,
+    healthcareSelection,
+    formattedDate,
+    appointmentComment,
+  );
+  await prj03Pt04.verifyAppointmentHistoryBooking(
+    formattedDate,
+    comboFacilityValue,
+    hospitalReadmission,
+    healthcareSelection,
+    appointmentComment,
+  );
+});
+
+test("TC041 - E2E Flow - Tokyo CURA Healthcare Center | hospitalReadmission = 'Y' + Medicare", async ({
+  page,
+}) => {
+  await prj03Pt04.loginCURAWebsite();
+
+  const headerLocation = "h2";
+  const headerTextResult = "Login";
+  await prj03Pt04.verifyHeaderLocator(headerLocation, headerTextResult);
+
+  await prj03Pt04.fillUpLoginCredentials();
+
+  let formattedDate = prj03Pt04.computeRandDate();
+  const comboFacilityValue = "Tokyo CURA Healthcare Center";
+  const hospitalReadmission = "Yes";
+  const healthcareSelection = "Medicare";
+  const appointmentComment = healthcareSelection + " Appointment Booking";
+
+  await prj03Pt04.fillUpApplicationForm(
+    comboFacilityValue,
+    healthcareSelection,
+    hospitalReadmission,
+    formattedDate,
+    appointmentComment,
+  );
+
+  await prj03Pt04.verifyAppointmentBooking(
+    comboFacilityValue,
+    hospitalReadmission,
+    healthcareSelection,
+    formattedDate,
+    appointmentComment,
+  );
+  await prj03Pt04.verifyAppointmentHistoryBooking(
+    formattedDate,
+    comboFacilityValue,
+    hospitalReadmission,
+    healthcareSelection,
+    appointmentComment,
+  );
+});
+
+test("TC042 - E2E Flow - Hongkong CURA Healthcare Center | hospitalReadmission = 'Y' + Medicare", async ({
+  page,
+}) => {
+  await prj03Pt04.loginCURAWebsite();
+
+  const headerLocation = "h2";
+  const headerTextResult = "Login";
+  await prj03Pt04.verifyHeaderLocator(headerLocation, headerTextResult);
+
+  await prj03Pt04.fillUpLoginCredentials();
+
+  let formattedDate = prj03Pt04.computeRandDate();
+  const comboFacilityValue = "Hongkong CURA Healthcare Center";
+  const hospitalReadmission = "Yes";
+  const healthcareSelection = "Medicare";
+  const appointmentComment = healthcareSelection + " Appointment Booking";
+
+  await prj03Pt04.fillUpApplicationForm(
+    comboFacilityValue,
+    healthcareSelection,
+    hospitalReadmission,
+    formattedDate,
+    appointmentComment,
+  );
+
+  await prj03Pt04.verifyAppointmentBooking(
+    comboFacilityValue,
+    hospitalReadmission,
+    healthcareSelection,
+    formattedDate,
+    appointmentComment,
+  );
+  await prj03Pt04.verifyAppointmentHistoryBooking(
+    formattedDate,
+    comboFacilityValue,
+    hospitalReadmission,
+    healthcareSelection,
+    appointmentComment,
+  );
+});
+
+test("TC043 - E2E Flow - Seoul CURA Healthcare Center | hospitalReadmission = 'Y' + Medicare", async ({
+  page,
+}) => {
+  await prj03Pt04.loginCURAWebsite();
+
+  const headerLocation = "h2";
+  const headerTextResult = "Login";
+  await prj03Pt04.verifyHeaderLocator(headerLocation, headerTextResult);
+
+  await prj03Pt04.fillUpLoginCredentials();
+
+  let formattedDate = prj03Pt04.computeRandDate();
+  const comboFacilityValue = "Seoul CURA Healthcare Center";
+  const hospitalReadmission = "Yes";
+  const healthcareSelection = "Medicare";
+  const appointmentComment = healthcareSelection + " Appointment Booking";
+
+  await prj03Pt04.fillUpApplicationForm(
+    comboFacilityValue,
+    healthcareSelection,
+    hospitalReadmission,
+    formattedDate,
+    appointmentComment,
+  );
+
+  await prj03Pt04.verifyAppointmentBooking(
+    comboFacilityValue,
+    hospitalReadmission,
+    healthcareSelection,
+    formattedDate,
+    appointmentComment,
+  );
+  await prj03Pt04.verifyAppointmentHistoryBooking(
+    formattedDate,
+    comboFacilityValue,
+    hospitalReadmission,
+    healthcareSelection,
+    appointmentComment,
+  );
+});
+
+test("TC044 - E2E Flow - Tokyo CURA Healthcare Center | hospitalReadmission = 'N' + Medicaid", async ({
+  page,
+}) => {
+  await prj03Pt04.loginCURAWebsite();
+
+  const headerLocation = "h2";
+  const headerTextResult = "Login";
+  await prj03Pt04.verifyHeaderLocator(headerLocation, headerTextResult);
+
+  await prj03Pt04.fillUpLoginCredentials();
+
+  let formattedDate = prj03Pt04.computeRandDate();
+  const comboFacilityValue = "Tokyo CURA Healthcare Center";
+  const hospitalReadmission = "No";
+  const healthcareSelection = "Medicaid";
+  const appointmentComment = healthcareSelection + " Appointment Booking";
+
+  await prj03Pt04.fillUpApplicationForm(
+    comboFacilityValue,
+    healthcareSelection,
+    hospitalReadmission,
+    formattedDate,
+    appointmentComment,
+  );
+
+  await prj03Pt04.verifyAppointmentBooking(
+    comboFacilityValue,
+    hospitalReadmission,
+    healthcareSelection,
+    formattedDate,
+    appointmentComment,
+  );
+  await prj03Pt04.verifyAppointmentHistoryBooking(
+    formattedDate,
+    comboFacilityValue,
+    hospitalReadmission,
+    healthcareSelection,
+    appointmentComment,
+  );
+});
+
+test("TC045 - E2E Flow - Hongkong CURA Healthcare Center | hospitalReadmission = 'N' + Medicaid", async ({
+  page,
+}) => {
+  await prj03Pt04.loginCURAWebsite();
+
+  const headerLocation = "h2";
+  const headerTextResult = "Login";
+  await prj03Pt04.verifyHeaderLocator(headerLocation, headerTextResult);
+
+  await prj03Pt04.fillUpLoginCredentials();
+
+  let formattedDate = prj03Pt04.computeRandDate();
+  const comboFacilityValue = "Hongkong CURA Healthcare Center";
+  const hospitalReadmission = "No";
+  const healthcareSelection = "Medicaid";
+  const appointmentComment = healthcareSelection + " Appointment Booking";
+
+  await prj03Pt04.fillUpApplicationForm(
+    comboFacilityValue,
+    healthcareSelection,
+    hospitalReadmission,
+    formattedDate,
+    appointmentComment,
+  );
+
+  await prj03Pt04.verifyAppointmentBooking(
+    comboFacilityValue,
+    hospitalReadmission,
+    healthcareSelection,
+    formattedDate,
+    appointmentComment,
+  );
+  await prj03Pt04.verifyAppointmentHistoryBooking(
+    formattedDate,
+    comboFacilityValue,
+    hospitalReadmission,
+    healthcareSelection,
+    appointmentComment,
+  );
+});
+
+test("TC046 - E2E Flow - Seoul CURA Healthcare Center | hospitalReadmission = 'N' + Medicaid", async ({
+  page,
+}) => {
+  await prj03Pt04.loginCURAWebsite();
+
+  const headerLocation = "h2";
+  const headerTextResult = "Login";
+  await prj03Pt04.verifyHeaderLocator(headerLocation, headerTextResult);
+
+  await prj03Pt04.fillUpLoginCredentials();
+
+  let formattedDate = prj03Pt04.computeRandDate();
+  const comboFacilityValue = "Seoul CURA Healthcare Center";
+  const hospitalReadmission = "No";
+  const healthcareSelection = "Medicaid";
+  const appointmentComment = healthcareSelection + " Appointment Booking";
+
+  await prj03Pt04.fillUpApplicationForm(
+    comboFacilityValue,
+    healthcareSelection,
+    hospitalReadmission,
+    formattedDate,
+    appointmentComment,
+  );
+
+  await prj03Pt04.verifyAppointmentBooking(
+    comboFacilityValue,
+    hospitalReadmission,
+    healthcareSelection,
+    formattedDate,
+    appointmentComment,
+  );
+  await prj03Pt04.verifyAppointmentHistoryBooking(
+    formattedDate,
+    comboFacilityValue,
+    hospitalReadmission,
+    healthcareSelection,
+    appointmentComment,
+  );
+});
+
+test("TC047 - E2E Flow - Tokyo CURA Healthcare Center | hospitalReadmission = 'Y' + Medicaid", async ({
+  page,
+}) => {
+  await prj03Pt04.loginCURAWebsite();
+
+  const headerLocation = "h2";
+  const headerTextResult = "Login";
+  await prj03Pt04.verifyHeaderLocator(headerLocation, headerTextResult);
+
+  await prj03Pt04.fillUpLoginCredentials();
+
+  let formattedDate = prj03Pt04.computeRandDate();
+  const comboFacilityValue = "Tokyo CURA Healthcare Center";
+  const hospitalReadmission = "Yes";
+  const healthcareSelection = "Medicaid";
+  const appointmentComment = healthcareSelection + " Appointment Booking";
+
+  await prj03Pt04.fillUpApplicationForm(
+    comboFacilityValue,
+    healthcareSelection,
+    hospitalReadmission,
+    formattedDate,
+    appointmentComment,
+  );
+
+  await prj03Pt04.verifyAppointmentBooking(
+    comboFacilityValue,
+    hospitalReadmission,
+    healthcareSelection,
+    formattedDate,
+    appointmentComment,
+  );
+  await prj03Pt04.verifyAppointmentHistoryBooking(
+    formattedDate,
+    comboFacilityValue,
+    hospitalReadmission,
+    healthcareSelection,
+    appointmentComment,
+  );
+});
+
+test("TC048 - E2E Flow - Hongkong CURA Healthcare Center | hospitalReadmission = 'Y' + Medicaid", async ({
+  page,
+}) => {
+  await prj03Pt04.loginCURAWebsite();
+
+  const headerLocation = "h2";
+  const headerTextResult = "Login";
+  await prj03Pt04.verifyHeaderLocator(headerLocation, headerTextResult);
+
+  await prj03Pt04.fillUpLoginCredentials();
+
+  let formattedDate = prj03Pt04.computeRandDate();
+  const comboFacilityValue = "Hongkong CURA Healthcare Center";
+  const hospitalReadmission = "Yes";
+  const healthcareSelection = "Medicaid";
+  const appointmentComment = healthcareSelection + " Appointment Booking";
+
+  await prj03Pt04.fillUpApplicationForm(
+    comboFacilityValue,
+    healthcareSelection,
+    hospitalReadmission,
+    formattedDate,
+    appointmentComment,
+  );
+
+  await prj03Pt04.verifyAppointmentBooking(
+    comboFacilityValue,
+    hospitalReadmission,
+    healthcareSelection,
+    formattedDate,
+    appointmentComment,
+  );
+  await prj03Pt04.verifyAppointmentHistoryBooking(
+    formattedDate,
+    comboFacilityValue,
+    hospitalReadmission,
+    healthcareSelection,
+    appointmentComment,
+  );
+});
+
+test("TC049 - E2E Flow - Seoul CURA Healthcare Center | hospitalReadmission = 'Y' + Medicaid", async ({
+  page,
+}) => {
+  await prj03Pt04.loginCURAWebsite();
+
+  const headerLocation = "h2";
+  const headerTextResult = "Login";
+  await prj03Pt04.verifyHeaderLocator(headerLocation, headerTextResult);
+
+  await prj03Pt04.fillUpLoginCredentials();
+
+  let formattedDate = prj03Pt04.computeRandDate();
+  const comboFacilityValue = "Seoul CURA Healthcare Center";
+  const hospitalReadmission = "Yes";
+  const healthcareSelection = "Medicaid";
+  const appointmentComment = healthcareSelection + " Appointment Booking";
+
+  await prj03Pt04.fillUpApplicationForm(
+    comboFacilityValue,
+    healthcareSelection,
+    hospitalReadmission,
+    formattedDate,
+    appointmentComment,
+  );
+
+  await prj03Pt04.verifyAppointmentBooking(
+    comboFacilityValue,
+    hospitalReadmission,
+    healthcareSelection,
+    formattedDate,
+    appointmentComment,
+  );
+  await prj03Pt04.verifyAppointmentHistoryBooking(
+    formattedDate,
+    comboFacilityValue,
+    hospitalReadmission,
+    healthcareSelection,
+    appointmentComment,
+  );
+});
+
+test("TC050 - E2E Flow - Tokyo CURA Healthcare Center | hospitalReadmission = 'N' + None", async ({
+  page,
+}) => {
+  await prj03Pt04.loginCURAWebsite();
+
+  const headerLocation = "h2";
+  const headerTextResult = "Login";
+  await prj03Pt04.verifyHeaderLocator(headerLocation, headerTextResult);
+
+  await prj03Pt04.fillUpLoginCredentials();
+
+  let formattedDate = prj03Pt04.computeRandDate();
+  const comboFacilityValue = "Tokyo CURA Healthcare Center";
+  const hospitalReadmission = "No";
+  const healthcareSelection = "None";
+  const appointmentComment = healthcareSelection + " Appointment Booking";
+
+  await prj03Pt04.fillUpApplicationForm(
+    comboFacilityValue,
+    healthcareSelection,
+    hospitalReadmission,
+    formattedDate,
+    appointmentComment,
+  );
+
+  await prj03Pt04.verifyAppointmentBooking(
+    comboFacilityValue,
+    hospitalReadmission,
+    healthcareSelection,
+    formattedDate,
+    appointmentComment,
+  );
+  await prj03Pt04.verifyAppointmentHistoryBooking(
+    formattedDate,
+    comboFacilityValue,
+    hospitalReadmission,
+    healthcareSelection,
+    appointmentComment,
+  );
+});
+
+test("TC051 - E2E Flow - Hongkong CURA Healthcare Center | hospitalReadmission = 'N' + None", async ({
+  page,
+}) => {
+  await prj03Pt04.loginCURAWebsite();
+
+  const headerLocation = "h2";
+  const headerTextResult = "Login";
+  await prj03Pt04.verifyHeaderLocator(headerLocation, headerTextResult);
+
+  await prj03Pt04.fillUpLoginCredentials();
+
+  let formattedDate = prj03Pt04.computeRandDate();
+  const comboFacilityValue = "Hongkong CURA Healthcare Center";
+  const hospitalReadmission = "No";
+  const healthcareSelection = "None";
+  const appointmentComment = healthcareSelection + " Appointment Booking";
+
+  await prj03Pt04.fillUpApplicationForm(
+    comboFacilityValue,
+    healthcareSelection,
+    hospitalReadmission,
+    formattedDate,
+    appointmentComment,
+  );
+
+  await prj03Pt04.verifyAppointmentBooking(
+    comboFacilityValue,
+    hospitalReadmission,
+    healthcareSelection,
+    formattedDate,
+    appointmentComment,
+  );
+  await prj03Pt04.verifyAppointmentHistoryBooking(
+    formattedDate,
+    comboFacilityValue,
+    hospitalReadmission,
+    healthcareSelection,
+    appointmentComment,
+  );
+});
+
+test("TC052 - E2E Flow - Seoul CURA Healthcare Center | hospitalReadmission = 'N' + None", async ({
+  page,
+}) => {
+  await prj03Pt04.loginCURAWebsite();
+
+  const headerLocation = "h2";
+  const headerTextResult = "Login";
+  await prj03Pt04.verifyHeaderLocator(headerLocation, headerTextResult);
+
+  await prj03Pt04.fillUpLoginCredentials();
+
+  let formattedDate = prj03Pt04.computeRandDate();
+  const comboFacilityValue = "Seoul CURA Healthcare Center";
+  const hospitalReadmission = "No";
+  const healthcareSelection = "None";
+  const appointmentComment = healthcareSelection + " Appointment Booking";
+
+  await prj03Pt04.fillUpApplicationForm(
+    comboFacilityValue,
+    healthcareSelection,
+    hospitalReadmission,
+    formattedDate,
+    appointmentComment,
+  );
+
+  await prj03Pt04.verifyAppointmentBooking(
+    comboFacilityValue,
+    hospitalReadmission,
+    healthcareSelection,
+    formattedDate,
+    appointmentComment,
+  );
+  await prj03Pt04.verifyAppointmentHistoryBooking(
+    formattedDate,
+    comboFacilityValue,
+    hospitalReadmission,
+    healthcareSelection,
+    appointmentComment,
+  );
+});
+
+test("TC053 - E2E Flow - Tokyo CURA Healthcare Center | hospitalReadmission = 'Y' + None", async ({
+  page,
+}) => {
+  await prj03Pt04.loginCURAWebsite();
+
+  const headerLocation = "h2";
+  const headerTextResult = "Login";
+  await prj03Pt04.verifyHeaderLocator(headerLocation, headerTextResult);
+
+  await prj03Pt04.fillUpLoginCredentials();
+
+  let formattedDate = prj03Pt04.computeRandDate();
+  const comboFacilityValue = "Tokyo CURA Healthcare Center";
+  const hospitalReadmission = "Yes";
+  const healthcareSelection = "None";
+  const appointmentComment = healthcareSelection + " Appointment Booking";
+
+  await prj03Pt04.fillUpApplicationForm(
+    comboFacilityValue,
+    healthcareSelection,
+    hospitalReadmission,
+    formattedDate,
+    appointmentComment,
+  );
+
+  await prj03Pt04.verifyAppointmentBooking(
+    comboFacilityValue,
+    hospitalReadmission,
+    healthcareSelection,
+    formattedDate,
+    appointmentComment,
+  );
+  await prj03Pt04.verifyAppointmentHistoryBooking(
+    formattedDate,
+    comboFacilityValue,
+    hospitalReadmission,
+    healthcareSelection,
+    appointmentComment,
+  );
+});
+
+test("TC054 - E2E Flow - Hongkong CURA Healthcare Center | hospitalReadmission = 'Y' + None", async ({
+  page,
+}) => {
+  await prj03Pt04.loginCURAWebsite();
+
+  const headerLocation = "h2";
+  const headerTextResult = "Login";
+  await prj03Pt04.verifyHeaderLocator(headerLocation, headerTextResult);
+
+  await prj03Pt04.fillUpLoginCredentials();
+
+  let formattedDate = prj03Pt04.computeRandDate();
+  const comboFacilityValue = "Hongkong CURA Healthcare Center";
+  const hospitalReadmission = "Yes";
+  const healthcareSelection = "None";
+  const appointmentComment = healthcareSelection + " Appointment Booking";
+
+  await prj03Pt04.fillUpApplicationForm(
+    comboFacilityValue,
+    healthcareSelection,
+    hospitalReadmission,
+    formattedDate,
+    appointmentComment,
+  );
+
+  await prj03Pt04.verifyAppointmentBooking(
+    comboFacilityValue,
+    hospitalReadmission,
+    healthcareSelection,
+    formattedDate,
+    appointmentComment,
+  );
+  await prj03Pt04.verifyAppointmentHistoryBooking(
+    formattedDate,
+    comboFacilityValue,
+    hospitalReadmission,
+    healthcareSelection,
+    appointmentComment,
+  );
+});
+
+test("TC055 - E2E Flow - Seoul CURA Healthcare Center | hospitalReadmission = 'Y' + None", async ({
+  page,
+}) => {
+  await prj03Pt04.loginCURAWebsite();
+
+  const headerLocation = "h2";
+  const headerTextResult = "Login";
+  await prj03Pt04.verifyHeaderLocator(headerLocation, headerTextResult);
+
+  await prj03Pt04.fillUpLoginCredentials();
+
+  let formattedDate = prj03Pt04.computeRandDate();
+  const comboFacilityValue = "Seoul CURA Healthcare Center";
+  const hospitalReadmission = "Yes";
+  const healthcareSelection = "None";
+  const appointmentComment = healthcareSelection + " Appointment Booking";
+
+  await prj03Pt04.fillUpApplicationForm(
+    comboFacilityValue,
+    healthcareSelection,
+    hospitalReadmission,
+    formattedDate,
+    appointmentComment,
+  );
+
+  await prj03Pt04.verifyAppointmentBooking(
+    comboFacilityValue,
+    hospitalReadmission,
+    healthcareSelection,
+    formattedDate,
+    appointmentComment,
+  );
+  await prj03Pt04.verifyAppointmentHistoryBooking(
+    formattedDate,
+    comboFacilityValue,
+    hospitalReadmission,
+    healthcareSelection,
+    appointmentComment,
+  );
+});
+
+// playwright config
+
+// @ts-check
+import { defineConfig, devices } from "@playwright/test";
+
+/**
+ * Read environment variables from file.
+ * https://github.com/motdotla/dotenv
+ */
+// import dotenv from 'dotenv';
+// import path from 'path';
+// dotenv.config({ path: path.resolve(__dirname, '.env') });
+
+/**
+ * @see https://playwright.dev/docs/test-configuration
+ */
+export default defineConfig({
+  testDir: "./tests",
+  /* Run tests in files in parallel */
+  fullyParallel: true,
+  /* Fail the build on CI if you accidentally left test.only in the source code. */
+  forbidOnly: !!process.env.CI,
+  /* Retry on CI only */
+  retries: process.env.CI ? 2 : 0,
+  /* Opt out of parallel tests on CI. */
+  workers: process.env.CI ? 1 : undefined,
+  /* Reporter to use. See https://playwright.dev/docs/test-reporters */
+  reporter: [["html"], ["allure-playwright"]],
+  /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
+  use: {
+    headless: true,
+    screenshot: "on",
+    video: "on",
+    trace: "on-first-retry",
+  },
+
+  /* Configure projects for major browsers */
+  projects: [
+    {
+      name: "Google Chrome",
+      use: {
+        browserName: "chromium",
+        channel: "chrome",
+      },
+    },
+  ],
+
+  /* Run your local dev server before starting the tests */
+  // webServer: {
+  //   command: 'npm run start',
+  //   url: 'http://localhost:3000',
+  //   reuseExistingServer: !process.env.CI,
+  // },
+});
