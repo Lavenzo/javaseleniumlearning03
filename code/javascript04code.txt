@@ -1,0 +1,606 @@
+// Helper Class
+import { test, expect } from "@playwright/test";
+
+export class project04_HelperClass_pt01 {
+  constructor(page) {
+    this.page = page;
+  }
+  async navigateWebPage(loginHeader) {
+    await test.step("Step 1: Navigate to Webpage", async () => {
+      await this.page.goto(
+        "https://opensource-demo.orangehrmlive.com/web/index.php/auth/login",
+      );
+    });
+
+    await test.step("Step 2: Verify User navigated successfully to Orange HRM Webpage", async () => {
+      await expect(loginHeader).toBeVisible();
+      await expect(loginHeader).toHaveText("Login");
+    });
+  }
+  async tc002_FillIncorrectCredentials(loginID, loginPwd, expectedErrorMsg) {
+    const usernameInputLocator = this.page.locator('input[name="username"]');
+    const passwordInputLocator = this.page.locator('input[name="password"]');
+    const loginButtonLocator = this.page.locator('button[type="submit"]');
+    const errorMessageLocator = this.page.locator("p.oxd-alert-content-text");
+
+    await test.step("Step 3: Enter incorrect credentials and click Login", async () => {
+      await usernameInputLocator.fill(loginID);
+      await passwordInputLocator.fill(loginPwd);
+      await loginButtonLocator.click();
+    });
+
+    await test.step("Step 4: Verify invalid credentials message", async () => {
+      await expect(errorMessageLocator).toBeVisible();
+      await expect(errorMessageLocator).toHaveText(expectedErrorMsg);
+    });
+  }
+  async tc003_FillCorrectCredentials(loginID, loginPwd) {
+    const usernameInputLocator = this.page.locator('input[name="username"]');
+    const passwordInputLocator = this.page.locator('input[name="password"]');
+    const loginButtonLocator = this.page.locator('button[type="submit"]');
+    const userDropdownNameLocator = this.page.locator(
+      "p.oxd-userdropdown-name",
+    );
+
+    await test.step("Step 3: Enter correct credentials and click Login", async () => {
+      await usernameInputLocator.fill(loginID);
+      await passwordInputLocator.fill(loginPwd);
+      await loginButtonLocator.click();
+    });
+
+    await test.step("Step 4: Verify successful login and user name", async () => {
+      const actualUserName = await userDropdownNameLocator.textContent();
+      console.log("Actual User Name from UI:", actualUserName);
+      await expect(userDropdownNameLocator).toBeVisible();
+      await this.page.waitForTimeout(3000);
+    });
+  }
+}
+
+import { test, expect } from "@playwright/test";
+
+export class project04_HelperClass_pt02 {
+  constructor(page) {
+    this.page = page;
+  }
+  async navigateWebPage(loginHeader) {
+    await test.step("Step 1: Navigate to Webpage", async () => {
+      await this.page.goto(
+        "https://opensource-demo.orangehrmlive.com/web/index.php/auth/login",
+      );
+    });
+
+    await test.step("Step 2: Verify User navigated successfully to Orange HRM Webpage", async () => {
+      await expect(loginHeader).toBeVisible();
+      await expect(loginHeader).toHaveText("Login");
+    });
+  }
+  async fillCorrectCredentials(loginID, loginPwd) {
+    const usernameInputLocator = this.page.locator('input[name="username"]');
+    const passwordInputLocator = this.page.locator('input[name="password"]');
+    const loginButtonLocator = this.page.locator('button[type="submit"]');
+    const userDropdownNameLocator = this.page.locator(
+      "p.oxd-userdropdown-name",
+    );
+
+    await test.step("Step 3: Enter correct credentials and click Login", async () => {
+      await usernameInputLocator.fill(loginID);
+      await passwordInputLocator.fill(loginPwd);
+      await loginButtonLocator.click();
+    });
+
+    await test.step("Step 4: Verify successful login and user name", async () => {
+      const actualUserName = await userDropdownNameLocator.textContent();
+      console.log("Actual User Name from UI:", actualUserName);
+      await expect(userDropdownNameLocator).toBeVisible();
+      await this.page.waitForTimeout(3000);
+    });
+  }
+  async tc009_navigateTimeSheetPage() {
+    await test.step("Step 5: Click on stopwatch icon to access the attendance page", async () => {
+      await this.page.locator("button:has(i.bi-stopwatch)").click();
+    });
+
+    await test.step("Step 6: Check user navigation to the attenance page", async () => {
+      const punchInHeaderLocator = this.page.locator("h6.orangehrm-main-title");
+      await expect(punchInHeaderLocator).toHaveText("Punch In");
+      await this.page.waitForTimeout(1000);
+    });
+  }
+  getRandomDate() {
+    const start = new Date(2025, 0, 1);
+    const end = new Date(2026, 4, 31);
+    const randomDate = new Date(
+      start.getTime() + Math.random() * (end.getTime() - start.getTime()),
+    );
+    const year = randomDate.getFullYear();
+    const month = String(randomDate.getMonth() + 1).padStart(2, "0");
+    const day = String(randomDate.getDate()).padStart(2, "0");
+    const formattedDate = `${year}-${month}-${day}`;
+    return formattedDate;
+  }
+  getRandomTime() {
+    const hour = this.getHour();
+    const minute = this.getMin();
+    const formattedTime = `${String(hour).padStart(2, "0")}:${minute}`;
+    return formattedTime;
+  }
+  getHour() {
+    const hour = Math.floor(Math.random() * 24);
+    return hour;
+  }
+  getMin() {
+    const minute = String(Math.floor(Math.random() * 60)).padStart(2, "0");
+    return minute;
+  }
+  async tc010_fillUpPunchInTimesheet(
+    formattedDate,
+    formattedTime,
+    hour,
+    minute,
+  ) {
+    // Fill date - robust placeholder handling
+    const dateInputLocator = this.page
+      .locator('input[placeholder*="yyyy"]')
+      .or(this.page.locator('input[placeholder*="mm-dd-yyyy"]'))
+      .or(this.page.locator('input[placeholder*="yyyy-dd-mm"]'))
+      .first();
+
+    await dateInputLocator.waitFor({ state: "visible" });
+    await dateInputLocator.click();
+    await dateInputLocator.fill(formattedDate);
+    await dateInputLocator.dispatchEvent("change");
+    await this.page.waitForTimeout(300);
+
+    // Fill time using time picker (proven working method)
+    const timeInputLocator = this.page
+      .locator('input[placeholder="hh:mm"]')
+      .first();
+
+    console.log("Filling time using time picker...");
+    await timeInputLocator.click();
+    await this.page.waitForTimeout(500);
+
+    // Select hour from time picker
+
+    const hourOptions = this.page
+      .locator('.oxd-time-picker-hour-option, [role="option"]')
+      .filter({ hasText: String(hour).padStart(2, "0") });
+
+    if ((await hourOptions.count()) > 0) {
+      await hourOptions.first().click();
+      await this.page.waitForTimeout(300);
+    }
+
+    // Select minute from time picker
+    const minuteOptions = this.page
+      .locator('.oxd-time-picker-minute-option, [role="option"]')
+      .filter({ hasText: String(minute).padStart(2, "0") });
+
+    if ((await minuteOptions.count()) > 0) {
+      await minuteOptions.first().click();
+      await this.page.waitForTimeout(300);
+    }
+
+    // Confirm time selection
+    const confirmBtn = this.page.locator(
+      'button:has-text("OK"), button:has-text("Confirm"), .oxd-button--success',
+    );
+    if ((await confirmBtn.count()) > 0) {
+      await confirmBtn.first().click();
+      await this.page.waitForTimeout(500);
+    }
+
+    // Verify time was filled
+    const actualValue = await timeInputLocator.inputValue();
+    console.log("Time Field Value After Selection:", actualValue);
+
+    // Fill note
+    const noteTextAreaLocator = this.page.locator(
+      'textarea[placeholder="Type here"]',
+    );
+    const noteText = `Punch In Attendance Record\nPunch In Date: ${formattedDate}\nPunch In Time: ${formattedTime}`;
+    await noteTextAreaLocator.fill(noteText);
+
+    console.log("Generated Date:", formattedDate);
+    console.log("Generated Time:", formattedTime);
+
+    // Verification - all fields are filled
+    await test.step("Step 8: Verify all input fields are filled", async () => {
+      const dateInput = this.page
+        .locator('input[placeholder*="yyyy"]')
+        .or(this.page.locator('input[placeholder*="mm-dd-yyyy"]'))
+        .or(this.page.locator('input[placeholder*="yyyy-dd-mm"]'))
+        .first();
+
+      const timeInput = this.page.locator('input[placeholder="hh:mm"]').first();
+      const noteTextArea = this.page.locator(
+        'textarea[placeholder="Type here"]',
+      );
+
+      await this.page.waitForTimeout(1000);
+
+      await expect(dateInput).not.toHaveValue("");
+      await expect(timeInput).not.toHaveValue("");
+      await expect(noteTextArea).not.toHaveValue("");
+    });
+  }
+}
+
+// Tests
+import { test, expect } from "@playwright/test";
+import { project04_HelperClass_pt01 } from "../pages/project04_HelperClass_pt01";
+
+let prj04_pt01;
+test.beforeEach(async ({ page }) => {
+  prj04_pt01 = new project04_HelperClass_pt01(page);
+});
+
+test("TC001 - Verify User navigated successfully to Orange HRM Webpage", async ({
+  page,
+}) => {
+  const loginHeader = page.locator(
+    "h5.oxd-text.oxd-text--h5.orangehrm-login-title",
+  );
+  await prj04_pt01.navigateWebPage(loginHeader);
+});
+
+test("TC002 - Verify User input incorrect creditentials to login to Orange HRM Webpage", async ({
+  page,
+}) => {
+  // Pre-requisite login
+  const loginHeader = page.locator(
+    "h5.oxd-text.oxd-text--h5.orangehrm-login-title",
+  );
+  await prj04_pt01.navigateWebPage(loginHeader);
+
+  // Input Incorrect Login Credentials
+  const loginID = "WrongID";
+  const loginPwd = "WrongPassword";
+  const expectedErrorMsg = "Invalid credentials";
+  await prj04_pt01.tc002_FillIncorrectCredentials(
+    loginID,
+    loginPwd,
+    expectedErrorMsg,
+  );
+});
+
+test("TC003 - Verify User input correct credentials to login to Orange HRM Webpage", async ({
+  page,
+}) => {
+  // Pre-requisite login
+  const loginHeader = page.locator(
+    "h5.oxd-text.oxd-text--h5.orangehrm-login-title",
+  );
+  await prj04_pt01.navigateWebPage(loginHeader);
+
+  // Input Correct Login Credentials
+  const loginID = "Admin";
+  const loginPwd = "admin123";
+  await prj04_pt01.tc003_FillCorrectCredentials(loginID, loginPwd);
+});
+
+test("TC004 – Verify navigation to LinkedIn page via icon click", async ({
+  page,
+}) => {
+  // Pre-requisite login
+  const loginHeader = page.locator(
+    "h5.oxd-text.oxd-text--h5.orangehrm-login-title",
+  );
+  await prj04_pt01.navigateWebPage(loginHeader);
+
+  // Verify Linkedin Icon to check for broken links
+  const linkedInIconLocator = page.locator('a[href*="linkedin"]');
+  const linkedInHeaderLocator = page.locator("h1");
+
+  await test.step("Step 3: Click LinkedIn icon", async () => {
+    await linkedInIconLocator.scrollIntoViewIfNeeded();
+    const [newPage] = await Promise.all([
+      page.context().waitForEvent("page"),
+      linkedInIconLocator.click(),
+    ]);
+    await test.step("Step 4: Verify navigation to LinkedIn page", async () => {
+      await newPage.waitForLoadState();
+
+      const pageContent = await newPage.locator("body").textContent();
+      console.log("LinkedIn Page Content:", pageContent);
+
+      await expect(newPage.locator("h1")).toBeVisible();
+      await expect(newPage.locator("h1")).toContainText("OrangeHRM");
+    });
+  });
+});
+
+test("TC005 – Verify navigation to Facebook page via icon click", async ({
+  page,
+}) => {
+  // Pre-requisite login
+  const loginHeader = page.locator(
+    "h5.oxd-text.oxd-text--h5.orangehrm-login-title",
+  );
+  await prj04_pt01.navigateWebPage(loginHeader);
+
+  // Verify Facebook Icon to check for broken links
+  const facebookIconLocator = page.locator('a[href*="facebook"]');
+
+  await test.step("Step 3: Click Facebook icon", async () => {
+    await facebookIconLocator.scrollIntoViewIfNeeded();
+    const [newPage] = await Promise.all([
+      page.context().waitForEvent("page"),
+      facebookIconLocator.click(),
+    ]);
+
+    await test.step("Step 4: Verify navigation to LinkedIn page", async () => {
+      await newPage.waitForLoadState();
+
+      const pageContent = await newPage.locator("body").textContent();
+      console.log("Facebook Page Content:", pageContent);
+
+      const facebookTextLocator = newPage
+        .locator('div:has-text("OrangeHRM")')
+        .first();
+
+      await expect(facebookTextLocator).toBeVisible();
+      await expect(facebookTextLocator).toContainText("OrangeHRM");
+    });
+  });
+});
+
+test("TC006 – Verify navigation to Twitter page via icon click", async ({
+  page,
+}) => {
+  // Pre-requisite login
+  const loginHeader = page.locator(
+    "h5.oxd-text.oxd-text--h5.orangehrm-login-title",
+  );
+  await prj04_pt01.navigateWebPage(loginHeader);
+
+  // Verify Twitter Icon to check for broken links
+  const twitterIconLocator = page.locator('a[href*="twitter"]');
+
+  await test.step("Step 3: Click Twitter icon", async () => {
+    await twitterIconLocator.scrollIntoViewIfNeeded();
+    const [newPage] = await Promise.all([
+      page.context().waitForEvent("page"),
+      twitterIconLocator.click(),
+    ]);
+
+    await test.step("Step 4: Verify navigation to Twitter page", async () => {
+      await newPage.waitForLoadState();
+
+      const pageContent = await newPage.locator("body").textContent();
+      console.log("Twitter Page Content:", pageContent);
+
+      const twitterTextLocator = newPage
+        .locator('div:has-text("OrangeHRM")')
+        .first();
+
+      await expect(twitterTextLocator).toBeVisible();
+      await expect(twitterTextLocator).toContainText("OrangeHRM");
+    });
+  });
+});
+
+test("TC007 – Verify navigation to YouTube page via icon click", async ({
+  page,
+}) => {
+  // Pre-requisite login
+  const loginHeader = page.locator(
+    "h5.oxd-text.oxd-text--h5.orangehrm-login-title",
+  );
+  await prj04_pt01.navigateWebPage(loginHeader);
+
+  // Verify YouTube Icon to check for broken links
+  const youtubeIconLocator = page.locator('a[href*="youtube"]');
+
+  await test.step("Step 3: Click YouTube icon", async () => {
+    await youtubeIconLocator.scrollIntoViewIfNeeded();
+    const [newPage] = await Promise.all([
+      page.context().waitForEvent("page"),
+      youtubeIconLocator.click(),
+    ]);
+
+    await test.step("Step 4: Verify navigation to YouTube page", async () => {
+      await newPage.waitForLoadState();
+
+      const pageContent = await newPage.locator("body").textContent();
+      console.log("YouTube Page Content:", pageContent);
+
+      const youtubeTextLocator = newPage
+        .locator('span:has-text("OrangeHRM Inc")')
+        .first();
+
+      await expect(youtubeTextLocator).toBeVisible();
+      await expect(youtubeTextLocator).toContainText("OrangeHRM");
+    });
+  });
+});
+
+test("TC008 – Verify navigation to OrangeHRM solutions page", async ({
+  page,
+}) => {
+  // Pre-requisite login
+  const loginHeader = page.locator(
+    "h5.oxd-text.oxd-text--h5.orangehrm-login-title",
+  );
+  await prj04_pt01.navigateWebPage(loginHeader);
+
+  // Verify OrangeHRM link to check for broken links
+  const orangeHRMLinkLocator = page.locator('a[href*="orangehrm.com"]');
+
+  await test.step("Step 3: Click OrangeHRM link", async () => {
+    await orangeHRMLinkLocator.scrollIntoViewIfNeeded();
+    const [newPage] = await Promise.all([
+      page.context().waitForEvent("page"),
+      orangeHRMLinkLocator.click(),
+    ]);
+
+    await test.step("Step 4: Verify navigation to OrangeHRM solutions page", async () => {
+      await newPage.waitForLoadState();
+
+      const pageContent = await newPage.locator("body").textContent();
+      console.log("OrangeHRM Page Content:", pageContent);
+
+      const orangeHRMTextLocator = newPage
+        .locator(
+          'span:has-text("Webinar - Sustaining a Compliant and Engaged Workplace")',
+        )
+        .first();
+
+      await expect(orangeHRMTextLocator).toBeVisible();
+      await expect(orangeHRMTextLocator).toContainText(
+        "Sustaining a Compliant and Engaged Workplace",
+      );
+    });
+  });
+});
+
+import { test, expect } from "@playwright/test";
+import { project04_HelperClass_pt02 } from "../pages/project04_HelperClass_pt02";
+
+let prj04_pt02;
+
+test.beforeEach(async ({ page }) => {
+  prj04_pt02 = new project04_HelperClass_pt02(page);
+});
+
+test("TC009 - Verify User login to Orange HRM Webpage", async ({ page }) => {
+  // Pre-requisite login
+  const loginHeader = page.locator(
+    "h5.oxd-text.oxd-text--h5.orangehrm-login-title",
+  );
+  await prj04_pt02.navigateWebPage(loginHeader);
+
+  // Input Correct Login Credentials
+  const loginID = "Admin";
+  const loginPwd = "admin123";
+  await prj04_pt02.fillCorrectCredentials(loginID, loginPwd);
+});
+
+test("TC009 - Verify User navigation to Orange HRM Dashboard and access the attendance timesheet tracker", async ({
+  page,
+}) => {
+  // Pre-requisite login
+  const loginHeader = page.locator(
+    "h5.oxd-text.oxd-text--h5.orangehrm-login-title",
+  );
+  await prj04_pt02.navigateWebPage(loginHeader);
+
+  // Input Correct Login Credentials
+  const loginID = "Admin";
+  const loginPwd = "admin123";
+  await prj04_pt02.fillCorrectCredentials(loginID, loginPwd);
+
+  // From Dashboard access the timesheet page
+  await prj04_pt02.tc009_navigateTimeSheetPage();
+});
+
+test("TC010 - User fills up the Punch-In timesheet", async ({ page }) => {
+  // Pre-requisite login
+  const loginHeader = page.locator(
+    "h5.oxd-text.oxd-text--h5.orangehrm-login-title",
+  );
+  await prj04_pt02.navigateWebPage(loginHeader);
+
+  // Input Correct Login Credentials
+  const loginID = "Admin";
+  const loginPwd = "admin123";
+  await prj04_pt02.fillCorrectCredentials(loginID, loginPwd);
+
+  // From Dashboard access the timesheet page
+  await prj04_pt02.tc009_navigateTimeSheetPage();
+
+  // User fills up the Punch-In timesheet
+  const formattedDate = prj04_pt02.getRandomDate();
+
+  // Generate random time
+  const hour = prj04_pt02.getHour();
+  const minute = prj04_pt02.getMin();
+  const formattedTime = prj04_pt02.getRandomTime();
+
+  await prj04_pt02.tc010_fillUpPunchInTimesheet(
+    formattedDate,
+    formattedTime,
+    hour,
+    minute,
+  );
+});
+
+// Playwright Config
+// @ts-check
+import { defineConfig, devices } from "@playwright/test";
+
+/**
+ * Read environment variables from file.
+ * https://github.com/motdotla/dotenv
+ */
+// import dotenv from 'dotenv';
+// import path from 'path';
+// dotenv.config({ path: path.resolve(__dirname, '.env') });
+
+/**
+ * @see https://playwright.dev/docs/test-configuration
+ */
+export default defineConfig({
+  testDir: "./tests",
+  /* Run tests in files in parallel */
+  fullyParallel: true,
+  /* Fail the build on CI if you accidentally left test.only in the source code. */
+  forbidOnly: !!process.env.CI,
+  /* Retry on CI only */
+  retries: process.env.CI ? 2 : 0,
+  /* Opt out of parallel tests on CI. */
+  workers: process.env.CI ? 1 : undefined,
+  /* Reporter to use. See https://playwright.dev/docs/test-reporters */
+
+  reporter: [
+    ["list"], // console output
+    ["html"], // ✅ HTML report (for troubleshooting)
+    ["allure-playwright"], // ✅ Allure report
+  ],
+
+  /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
+
+  use: {
+    video: "on", // ✅ always record video
+    screenshot: "on", // ✅ always take screenshots (pass + fail)
+    trace: "on-first-retry", // optional but recommended
+  },
+
+  /* Configure projects for major browsers */
+  projects: [
+    {
+      name: "Google Chrome",
+      use: {
+        channel: "chrome",
+      },
+    },
+
+    /* Test against mobile viewports. */
+    // {
+    //   name: 'Mobile Chrome',
+    //   use: { ...devices['Pixel 5'] },
+    // },
+    // {
+    //   name: 'Mobile Safari',
+    //   use: { ...devices['iPhone 12'] },
+    // },
+
+    /* Test against branded browsers. */
+    // {
+    //   name: 'Microsoft Edge',
+    //   use: { ...devices['Desktop Edge'], channel: 'msedge' },
+    // },
+    // {
+    //   name: 'Google Chrome',
+    //   use: { ...devices['Desktop Chrome'], channel: 'chrome' },
+    // },
+  ],
+
+  /* Run your local dev server before starting the tests */
+  // webServer: {
+  //   command: 'npm run start',
+  //   url: 'http://localhost:3000',
+  //   reuseExistingServer: !process.env.CI,
+  // },
+});
