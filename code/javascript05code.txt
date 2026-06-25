@@ -1,0 +1,1032 @@
+// Helper Class
+import { test, expect } from "@playwright/test";
+
+export class project05_HelperClass_pt01 {
+  constructor(page) {
+    this.page = page;
+  }
+  async navigateWebPage(loginHeader) {
+    await test.step("Step 1: Navigate to Swag Labs website", async () => {
+      await this.page.goto("https://www.saucedemo.com/");
+    });
+
+    await test.step("Step 2: Verify user has navigated to the website", async () => {
+      const loginHeader = this.page.locator(".login_logo");
+      await expect(loginHeader).toHaveText("Swag Labs");
+    });
+  }
+  async tc002_fillUpWrongPassword() {
+    await test.step("Step 3: User enters invalid credentials and click login", async () => {
+      await this.page.fill("#user-name", "standard_user");
+      await this.page.fill("#password", "wrongpassword");
+      await this.page.click("#login-button");
+    });
+
+    await test.step("Step 4: Verify error message", async () => {
+      const errorMsg = this.page.locator('[data-test="error"]');
+      await expect(errorMsg).toHaveText(
+        "Epic sadface: Username and password do not match any user in this service",
+      );
+    });
+  }
+  async fillUpCorrectPassword(userName, userPwd) {
+    await test.step(`Step 3: User enters userID: "${userName}" with correct password and click login`, async () => {
+      await this.page.fill("#user-name", userName);
+      await this.page.fill("#password", userPwd);
+      await this.page.click("#login-button");
+    });
+
+    await test.step("Step 4: Verify user has login successfully", async () => {
+      if (userName === "locked_out_user") {
+        const errorMsg = this.page.locator('[data-test="error"]');
+        await expect(errorMsg).toHaveText(
+          "Epic sadface: Sorry, this user has been locked out.",
+        );
+      } else {
+        const productsTitle = this.page.locator('[data-test="title"]');
+        await expect(productsTitle).toHaveText("Products");
+      }
+    });
+  }
+}
+
+
+import { test, expect } from "@playwright/test";
+
+export class project05_HelperClass_pt02 {
+  constructor(page) {
+    this.page = page;
+    this.customer_list = [
+      "Yuna",
+      "Linda",
+      "Mike",
+      "乐乐",
+      "凯凯",
+      "James",
+      "Emma",
+      "Sophia",
+      "浩然",
+      "子轩",
+      "雨桐",
+      "William",
+      "Olivia",
+      "一诺",
+      "明宇",
+      "Lucas",
+      "Mia",
+      "星辰",
+      "Ethan",
+      "欣怡",
+    ];
+  }
+  getRandomClient() {
+    const randNum = Math.floor(Math.random() * this.customer_list.length);
+    return this.customer_list[randNum];
+  }
+  async navigateWebPage(loginHeader) {
+    await test.step("Step 1: Navigate to Swag Labs website", async () => {
+      await this.page.goto("https://www.saucedemo.com/");
+    });
+
+    await test.step("Step 2: Verify user has navigated to the website", async () => {
+      const loginHeader = this.page.locator(".login_logo");
+      await expect(loginHeader).toHaveText("Swag Labs");
+    });
+  }
+  async fillUpCorrectPassword(userName, userPwd) {
+    await test.step(`Step 3: User enters userID: "${userName}" with correct password and click login`, async () => {
+      await this.page.fill("#user-name", userName);
+      await this.page.fill("#password", userPwd);
+      await this.page.click("#login-button");
+    });
+
+    await test.step("Step 4: Verify user has login successfully", async () => {
+      if (userName === "locked_out_user") {
+        const errorMsg = this.page.locator('[data-test="error"]');
+        await expect(errorMsg).toHaveText(
+          "Epic sadface: Sorry, this user has been locked out.",
+        );
+      } else {
+        const productsTitle = this.page.locator('[data-test="title"]');
+        await expect(productsTitle).toHaveText("Products");
+        await this.page.waitForTimeout(2000);
+      }
+    });
+  }
+  async addCartItems(product, prdLocator, price) {
+    await test.step(`Step 5: Add "${product}" to cart and open cart`, async () => {
+      const addToCartBtn = this.page.locator(prdLocator);
+      await addToCartBtn.scrollIntoViewIfNeeded();
+      await addToCartBtn.click();
+
+      const cartIcon = this.page.locator('[data-test="shopping-cart-link"]');
+      await cartIcon.click();
+    });
+
+    await test.step(`Step 6: Verify item price is "${price}"`, async () => {
+      const priceLocator = this.page.locator(
+        '[data-test="inventory-item-price"]',
+      );
+      await expect(priceLocator).toHaveText(price);
+    });
+  }
+  async removeCartItem(removeBtn) {
+    await test.step("Step 7: Remove item from cart", async () => {
+      await removeBtn.click();
+    });
+    await test.step("Step 8: Checkout and fill user details", async () => {
+      await this.page.locator('[data-test="checkout"]').click();
+      await this.page.locator('[data-test="firstName"]').fill("test");
+      await this.page.locator('[data-test="lastName"]').fill("remove");
+      await this.page.locator('[data-test="postalCode"]').fill("123456");
+      await this.page.locator('[data-test="continue"]').click();
+    });
+
+    await test.step("Step 9: Verify subtotal is $0", async () => {
+      const subtotal = this.page.locator('[data-test="subtotal-label"]');
+      await expect(subtotal).toHaveText("Item total: $0");
+    });
+  }
+}
+
+
+import { test, expect } from "@playwright/test";
+
+export class project05_HelperClass_pt03 {
+  constructor(page) {
+    this.page = page;
+    this.customer_list = [
+      "Yuna",
+      "Linda",
+      "Mike",
+      "乐乐",
+      "凯凯",
+      "James",
+      "Emma",
+      "Sophia",
+      "浩然",
+      "子轩",
+      "雨桐",
+      "William",
+      "Olivia",
+      "一诺",
+      "明宇",
+      "Lucas",
+      "Mia",
+      "星辰",
+      "Ethan",
+      "欣怡",
+    ];
+  }
+  getRandomClient() {
+    const randNum = Math.floor(Math.random() * this.customer_list.length);
+    return this.customer_list[randNum];
+  }
+  async navigateWebPage(loginHeader) {
+    await test.step("Step 1: Navigate to Swag Labs website", async () => {
+      await this.page.goto("https://www.saucedemo.com/");
+    });
+
+    await test.step("Step 2: Verify user has navigated to the website", async () => {
+      const loginHeader = this.page.locator(".login_logo");
+      await expect(loginHeader).toHaveText("Swag Labs");
+    });
+  }
+  async fillUpCorrectPassword(userName, userPwd) {
+    await test.step(`Step 3: User enters userID: "${userName}" with correct password and click login`, async () => {
+      await this.page.fill("#user-name", userName);
+      await this.page.fill("#password", userPwd);
+      await this.page.click("#login-button");
+    });
+
+    await test.step("Step 4: Verify user has login successfully", async () => {
+      if (userName === "locked_out_user") {
+        const errorMsg = this.page.locator('[data-test="error"]');
+        await expect(errorMsg).toHaveText(
+          "Epic sadface: Sorry, this user has been locked out.",
+        );
+      } else {
+        const productsTitle = this.page.locator('[data-test="title"]');
+        await expect(productsTitle).toHaveText("Products");
+        await this.page.waitForTimeout(2000);
+      }
+    });
+  }
+  async addCartItems(product, prdLocator, price) {
+    await test.step(`Step 5: Add "${product}" to cart and open cart`, async () => {
+      const addToCartBtn = this.page.locator(prdLocator);
+      await addToCartBtn.scrollIntoViewIfNeeded();
+      await addToCartBtn.click();
+
+      const cartIcon = this.page.locator('[data-test="shopping-cart-link"]');
+      await cartIcon.click();
+    });
+
+    await test.step(`Step 6: Verify item price is "${price}"`, async () => {
+      const priceLocator = this.page.locator(
+        '[data-test="inventory-item-price"]',
+      );
+      await expect(priceLocator).toHaveText(price);
+    });
+  }
+  async fillCheckOutPage(clientFirstName, clientLastName) {
+    await test.step("Step 7: Click checkout button", async () => {
+      await this.page.locator('[data-test="checkout"]').click();
+    });
+
+    await test.step("Step 8: Fill customer details", async () => {
+      await this.page.locator('[data-test="firstName"]').fill(clientFirstName);
+      await this.page.locator('[data-test="lastName"]').fill(clientLastName);
+    });
+
+    await test.step("Step 9: Fill postal code", async () => {
+      const postalCode = Math.floor(100000 + Math.random() * 900000).toString();
+      await this.page.locator('[data-test="postalCode"]').fill(postalCode);
+    });
+
+    await test.step("Step 10: Click Continue", async () => {
+      await this.page.locator('[data-test="continue"]').click();
+    });
+  }
+  async verifyCheckOutPageAndPurchase(product, price) {
+    await test.step("Step 11: Verify checkout summary and finish order", async () => {
+      await expect(
+        this.page.locator('[data-test="inventory-item-name"]'),
+      ).toHaveText(product);
+      await expect(
+        this.page.locator('[data-test="inventory-item-price"]'),
+      ).toHaveText(price);
+      await this.page.locator('[data-test="finish"]').click();
+    });
+
+    await test.step("Step 12: Verify order confirmation page", async () => {
+      await expect(
+        this.page.locator('[data-test="complete-header"]'),
+      ).toHaveText("Thank you for your order!");
+      await expect(this.page.locator('[data-test="complete-text"]')).toHaveText(
+        "Your order has been dispatched, and will arrive just as fast as the pony can get there!",
+      );
+    });
+  }
+}
+
+// Tests
+import { test, expect } from "@playwright/test";
+import { project05_HelperClass_pt01 } from "../pages/project05_HelperClass_pt01";
+
+let prj05_pt01;
+test.beforeEach(async ({ page }) => {
+  prj05_pt01 = new project05_HelperClass_pt01(page);
+});
+
+test("TC001 - Verify User navigated successfully to Swag Labs Webpage", async ({
+  page,
+}) => {
+  const logoLocator = page.locator(".login_logo");
+  await prj05_pt01.navigateWebPage(logoLocator);
+});
+
+test("TC002 - Verify User input the wrong login credentials", async ({
+  page,
+}) => {
+  // User navigate to the Swags lab website
+  const logoLocator = page.locator(".login_logo");
+  await prj05_pt01.navigateWebPage(logoLocator);
+
+  // User fills up the ID and password
+  await prj05_pt01.tc002_fillUpWrongPassword();
+});
+
+test('TC003 - Verify User input the correct user login - "standard_user" credentials', async ({
+  page,
+}) => {
+  // User navigate to the Swags lab website
+  const logoLocator = page.locator(".login_logo");
+  await prj05_pt01.navigateWebPage(logoLocator);
+
+  // User fills up the ID and password
+  const userName = "standard_user";
+  const userPwd = "secret_sauce";
+  await prj05_pt01.fillUpCorrectPassword(userName, userPwd);
+});
+
+test('TC004 - Verify User input the locked user login  - "locked_out_user" credentials', async ({
+  page,
+}) => {
+  // User navigate to the Swags lab website
+  const logoLocator = page.locator(".login_logo");
+  await prj05_pt01.navigateWebPage(logoLocator);
+
+  // User fills up the ID and password
+  const userName = "locked_out_user";
+  const userPwd = "secret_sauce";
+  await prj05_pt01.fillUpCorrectPassword(userName, userPwd);
+});
+
+test('TC005 - Verify User input the correct user login - "problem_user" credentials', async ({
+  page,
+}) => {
+  // User navigate to the Swags lab website
+  const logoLocator = page.locator(".login_logo");
+  await prj05_pt01.navigateWebPage(logoLocator);
+
+  // User fills up the ID and password
+  const userName = "problem_user";
+  const userPwd = "secret_sauce";
+  await prj05_pt01.fillUpCorrectPassword(userName, userPwd);
+});
+
+test('TC006 - Verify User input the correct user login - "performance_glitch_user" credentials', async ({
+  page,
+}) => {
+  // User navigate to the Swags lab website
+  const logoLocator = page.locator(".login_logo");
+  await prj05_pt01.navigateWebPage(logoLocator);
+
+  // User fills up the ID and password
+  const userName = "performance_glitch_user";
+  const userPwd = "secret_sauce";
+  await prj05_pt01.fillUpCorrectPassword(userName, userPwd);
+});
+
+test('TC007 - Verify User input the correct user login - "error_user" credentials', async ({
+  page,
+}) => {
+  // User navigate to the Swags lab website
+  const logoLocator = page.locator(".login_logo");
+  await prj05_pt01.navigateWebPage(logoLocator);
+
+  // User fills up the ID and password
+  const userName = "error_user";
+  const userPwd = "secret_sauce";
+  await prj05_pt01.fillUpCorrectPassword(userName, userPwd);
+});
+
+test('TC008 - Verify User input the correct user login - "visual_user" credentials', async ({
+  page,
+}) => {
+  // User navigate to the Swags lab website
+  const logoLocator = page.locator(".login_logo");
+  await prj05_pt01.navigateWebPage(logoLocator);
+
+  // User fills up the ID and password
+  const userName = "visual_user";
+  const userPwd = "secret_sauce";
+  await prj05_pt01.fillUpCorrectPassword(userName, userPwd);
+});
+
+
+import { test, expect } from "@playwright/test";
+import { project05_HelperClass_pt02 } from "../pages/project05_HelperClass_pt02";
+
+let prj05_pt02;
+test.beforeEach(async ({ page }) => {
+  prj05_pt02 = new project05_HelperClass_pt02(page);
+});
+
+const productLocatorList = [
+  "#add-to-cart-sauce-labs-backpack",
+  "#add-to-cart-sauce-labs-bike-light",
+  "#add-to-cart-sauce-labs-bolt-t-shirt",
+  "#add-to-cart-sauce-labs-fleece-jacket",
+  "#add-to-cart-sauce-labs-onesie",
+  '[data-test="add-to-cart-test.allthethings()-t-shirt-(red)"]',
+];
+
+const productLocatorPriceMap = [
+  "$29.99",
+  "$9.99",
+  "$15.99",
+  "$49.99",
+  "$7.99",
+  "$15.99",
+];
+
+const removeBtnLocatorList = [
+  '[data-test="remove-sauce-labs-backpack"]',
+  '[data-test="remove-sauce-labs-bike-light"]',
+  '[data-test="remove-sauce-labs-bolt-t-shirt"]',
+  '[data-test="remove-sauce-labs-fleece-jacket"]',
+  '[data-test="remove-sauce-labs-onesie"]',
+  '[data-test="remove-test.allthethings()-t-shirt-(red)"]',
+];
+
+test('TC009 - Verify User login and selects the "Sauce Labs Backpack" item', async ({
+  page,
+}) => {
+  // User navigate to the Swags lab website
+  const logoLocator = page.locator(".login_logo");
+  await prj05_pt02.navigateWebPage(logoLocator);
+
+  // User fills up the ID and password
+  const userName = "standard_user";
+  const userPwd = "secret_sauce";
+  await prj05_pt02.fillUpCorrectPassword(userName, userPwd);
+
+  // User add the cart item and validate the pricing
+  const product = "Sauce Labs Backpack";
+  const prdLocator = productLocatorList[0];
+  const price = productLocatorPriceMap[0];
+  await prj05_pt02.addCartItems(product, prdLocator, price);
+});
+
+test('TC010 - Verify User login and selects the "Sauce Labs Bike Light" item', async ({
+  page,
+}) => {
+  // User navigate to the Swags lab website
+  const logoLocator = page.locator(".login_logo");
+  await prj05_pt02.navigateWebPage(logoLocator);
+
+  // User fills up the ID and password
+  const userName = "standard_user";
+  const userPwd = "secret_sauce";
+  await prj05_pt02.fillUpCorrectPassword(userName, userPwd);
+
+  // User add the cart item and validate the pricing
+  const product = "Sauce Labs Bike Light";
+  const prdLocator = productLocatorList[1];
+  const price = productLocatorPriceMap[1];
+  await prj05_pt02.addCartItems(product, prdLocator, price);
+});
+
+test('TC011 - Verify User login and selects the "Sauce Labs Bolt T-Shirt" item', async ({
+  page,
+}) => {
+  // User navigate to the Swags lab website
+  const logoLocator = page.locator(".login_logo");
+  await prj05_pt02.navigateWebPage(logoLocator);
+
+  // User fills up the ID and password
+  const userName = "standard_user";
+  const userPwd = "secret_sauce";
+  await prj05_pt02.fillUpCorrectPassword(userName, userPwd);
+
+  // User add the cart item and validate the pricing
+  const product = "Sauce Labs Bolt T-Shirt";
+  const prdLocator = productLocatorList[2];
+  const price = productLocatorPriceMap[2];
+  await prj05_pt02.addCartItems(product, prdLocator, price);
+});
+
+test('TC012 - Verify User login and selects the "Sauce Labs Fleece Jacket" item', async ({
+  page,
+}) => {
+  // User navigate to the Swags lab website
+  const logoLocator = page.locator(".login_logo");
+  await prj05_pt02.navigateWebPage(logoLocator);
+
+  // User fills up the ID and password
+  const userName = "standard_user";
+  const userPwd = "secret_sauce";
+  await prj05_pt02.fillUpCorrectPassword(userName, userPwd);
+
+  // User add the cart item and validate the pricing
+  const product = "Sauce Labs Fleece Jacket";
+  const prdLocator = productLocatorList[3];
+  const price = productLocatorPriceMap[3];
+  await prj05_pt02.addCartItems(product, prdLocator, price);
+});
+
+test('TC013 - Verify User login and selects the "Sauce Labs Onesie" item', async ({
+  page,
+}) => {
+  // User navigate to the Swags lab website
+  const logoLocator = page.locator(".login_logo");
+  await prj05_pt02.navigateWebPage(logoLocator);
+
+  // User fills up the ID and password
+  const userName = "standard_user";
+  const userPwd = "secret_sauce";
+  await prj05_pt02.fillUpCorrectPassword(userName, userPwd);
+
+  // User add the cart item and validate the pricing
+  const product = "Sauce Labs Onesie";
+  const prdLocator = productLocatorList[4];
+  const price = productLocatorPriceMap[4];
+  await prj05_pt02.addCartItems(product, prdLocator, price);
+});
+
+test('TC014 - Verify User login and selects the "Test.allTheThings() T-Shirt(Red)" item', async ({
+  page,
+}) => {
+  // User navigate to the Swags lab website
+  const logoLocator = page.locator(".login_logo");
+  await prj05_pt02.navigateWebPage(logoLocator);
+
+  // User fills up the ID and password
+  const userName = "standard_user";
+  const userPwd = "secret_sauce";
+  await prj05_pt02.fillUpCorrectPassword(userName, userPwd);
+
+  // User add the cart item and validate the pricing
+  const product = "Test.allTheThings() T-Shirt(Red)";
+  const prdLocator = productLocatorList[5];
+  const price = productLocatorPriceMap[5];
+  await prj05_pt02.addCartItems(product, prdLocator, price);
+});
+
+test('TC015 - Verify User login and selects the "Sauce Labs Backpack" item and remove it', async ({
+  page,
+}) => {
+  // User navigate to the Swags lab website
+  const logoLocator = page.locator(".login_logo");
+  await prj05_pt02.navigateWebPage(logoLocator);
+
+  // User fills up the ID and password
+  const userName = "standard_user";
+  const userPwd = "secret_sauce";
+  await prj05_pt02.fillUpCorrectPassword(userName, userPwd);
+
+  // User add the cart item and validate the pricing
+  const product = "Sauce Labs Backpack";
+  const prdLocator = productLocatorList[0];
+  const price = productLocatorPriceMap[0];
+  await prj05_pt02.addCartItems(product, prdLocator, price);
+
+  // User click the remove item to remove the item from cart and check item count = $0
+  const removeBtnLocator = page.locator(removeBtnLocatorList[0]);
+  await prj05_pt02.removeCartItem(removeBtnLocator);
+});
+
+test('TC016 - Verify User login and selects the "Sauce Labs Bike Light" item and remove it', async ({
+  page,
+}) => {
+  // User navigate to the Swags lab website
+  const logoLocator = page.locator(".login_logo");
+  await prj05_pt02.navigateWebPage(logoLocator);
+
+  // User fills up the ID and password
+  const userName = "standard_user";
+  const userPwd = "secret_sauce";
+  await prj05_pt02.fillUpCorrectPassword(userName, userPwd);
+
+  // User add the cart item and validate the pricing
+  const product = "Sauce Labs Bike Light";
+  const prdLocator = productLocatorList[1];
+  const price = productLocatorPriceMap[1];
+  await prj05_pt02.addCartItems(product, prdLocator, price);
+
+  // User click the remove item to remove the item from cart and check item count = $0
+  const removeBtnLocator = page.locator(removeBtnLocatorList[1]);
+  await prj05_pt02.removeCartItem(removeBtnLocator);
+});
+
+test('TC017 - Verify User login and selects the "Sauce Labs Bolt T-Shirt" item and remove it', async ({
+  page,
+}) => {
+  // User navigate to the Swags lab website
+  const logoLocator = page.locator(".login_logo");
+  await prj05_pt02.navigateWebPage(logoLocator);
+
+  // User fills up the ID and password
+  const userName = "standard_user";
+  const userPwd = "secret_sauce";
+  await prj05_pt02.fillUpCorrectPassword(userName, userPwd);
+
+  // User add the cart item and validate the pricing
+  const product = "Sauce Labs Bolt T-Shirt";
+  const prdLocator = productLocatorList[2];
+  const price = productLocatorPriceMap[2];
+  await prj05_pt02.addCartItems(product, prdLocator, price);
+
+  // User click the remove item to remove the item from cart and check item count = $0
+  const removeBtnLocator = page.locator(removeBtnLocatorList[2]);
+  await prj05_pt02.removeCartItem(removeBtnLocator);
+});
+
+test('TC018 - Verify User login and selects the "Sauce Labs Fleece Jacket" item and remove it', async ({
+  page,
+}) => {
+  // User navigate to the Swags lab website
+  const logoLocator = page.locator(".login_logo");
+  await prj05_pt02.navigateWebPage(logoLocator);
+
+  // User fills up the ID and password
+  const userName = "standard_user";
+  const userPwd = "secret_sauce";
+  await prj05_pt02.fillUpCorrectPassword(userName, userPwd);
+
+  // User add the cart item and validate the pricing
+  const product = "Sauce Labs Fleece Jacket";
+  const prdLocator = productLocatorList[3];
+  const price = productLocatorPriceMap[3];
+  await prj05_pt02.addCartItems(product, prdLocator, price);
+
+  // User click the remove item to remove the item from cart and check item count = $0
+  const removeBtnLocator = page.locator(removeBtnLocatorList[3]);
+  await prj05_pt02.removeCartItem(removeBtnLocator);
+});
+
+test('TC019 - Verify User login and selects the "Sauce Labs Onesie" item and remove it', async ({
+  page,
+}) => {
+  // User navigate to the Swags lab website
+  const logoLocator = page.locator(".login_logo");
+  await prj05_pt02.navigateWebPage(logoLocator);
+
+  // User fills up the ID and password
+  const userName = "standard_user";
+  const userPwd = "secret_sauce";
+  await prj05_pt02.fillUpCorrectPassword(userName, userPwd);
+
+  // User add the cart item and validate the pricing
+  const product = "Sauce Labs Onesie";
+  const prdLocator = productLocatorList[4];
+  const price = productLocatorPriceMap[4];
+  await prj05_pt02.addCartItems(product, prdLocator, price);
+
+  // User click the remove item to remove the item from cart and check item count = $0
+  const removeBtnLocator = page.locator(removeBtnLocatorList[4]);
+  await prj05_pt02.removeCartItem(removeBtnLocator);
+});
+
+test('TC020 - Verify User login and selects the "Test.allTheThings() T-Shirt (Red)" item and remove it', async ({
+  page,
+}) => {
+  // User navigate to the Swags lab website
+  const logoLocator = page.locator(".login_logo");
+  await prj05_pt02.navigateWebPage(logoLocator);
+
+  // User fills up the ID and password
+  const userName = "standard_user";
+  const userPwd = "secret_sauce";
+  await prj05_pt02.fillUpCorrectPassword(userName, userPwd);
+
+  // User add the cart item and validate the pricing
+  const product = "Test.allTheThings() T-Shirt (Red)";
+  const prdLocator = productLocatorList[5];
+  const price = productLocatorPriceMap[5];
+  await prj05_pt02.addCartItems(product, prdLocator, price);
+
+  // User click the remove item to remove the item from cart and check item count = $0
+  const removeBtnLocator = page.locator(removeBtnLocatorList[5]);
+  await prj05_pt02.removeCartItem(removeBtnLocator);
+});
+
+test("TC021 - Verify web navigate via the Twitter Link icon", async ({
+  page,
+}) => {
+  // User navigate to the Swags lab website
+  const logoLocator = page.locator(".login_logo");
+  await prj05_pt02.navigateWebPage(logoLocator);
+
+  // User fills up the ID and password
+  const userName = "standard_user";
+  const userPwd = "secret_sauce";
+  await prj05_pt02.fillUpCorrectPassword(userName, userPwd);
+
+  // Verify web navigate via the Twitter Link icon
+
+  await test.step("Step 5: Click Twitter link icon and switch to new tab", async () => {
+    const twitterIcon = page.locator('[data-test="social-twitter"]');
+    await twitterIcon.scrollIntoViewIfNeeded();
+    const [newPage] = await Promise.all([
+      page.context().waitForEvent("page"),
+      twitterIcon.click(),
+    ]);
+
+    await newPage.waitForLoadState();
+    page = newPage;
+  });
+
+  await test.step("Step 6: Verify navigation to Twitter page", async () => {
+    await expect(page).toHaveURL(/twitter\.com|x\.com/);
+
+    await expect(
+      page.getByRole("link", { name: "Sauce Labs" }).first(),
+    ).toBeVisible();
+  });
+});
+
+test("TC022 - Verify web navigate via the Facebook Link icon", async ({
+  page,
+}) => {
+  // User navigate to the Swags lab website
+  const logoLocator = page.locator(".login_logo");
+  await prj05_pt02.navigateWebPage(logoLocator);
+
+  // User fills up the ID and password
+  const userName = "standard_user";
+  const userPwd = "secret_sauce";
+  await prj05_pt02.fillUpCorrectPassword(userName, userPwd);
+
+  // Verify web navigate via the Facebook Link icon
+
+  await test.step("Step 5: Click Facebook link icon and switch to new tab", async () => {
+    const facebookIcon = page.locator('[data-test="social-facebook"]');
+    await facebookIcon.scrollIntoViewIfNeeded();
+    const [newPage] = await Promise.all([
+      page.context().waitForEvent("page"),
+      facebookIcon.click(),
+    ]);
+
+    await newPage.waitForLoadState();
+    page = newPage;
+  });
+
+  await test.step("Step 6: Verify navigation to Facebook page", async () => {
+    await expect(page).toHaveURL(/facebook\.com\/saucelabs/);
+    await expect(
+      page.locator('a[href*="facebook.com/saucelabs"]').first(),
+    ).toBeVisible();
+  });
+});
+
+test("TC023 - Verify web navigate via the Linkedin icon", async ({ page }) => {
+  // User navigate to the Swags lab website
+  const logoLocator = page.locator(".login_logo");
+  await prj05_pt02.navigateWebPage(logoLocator);
+
+  // User fills up the ID and password
+  const userName = "standard_user";
+  const userPwd = "secret_sauce";
+  await prj05_pt02.fillUpCorrectPassword(userName, userPwd);
+
+  // Verify web navigate via the Linkedin Link icon
+
+  await test.step("Step 5: Click Linkedin icon and switch to new tab", async () => {
+    const linkedinIcon = page.locator('[data-test="social-linkedin"]');
+    await linkedinIcon.scrollIntoViewIfNeeded();
+    const [newPage] = await Promise.all([
+      page.context().waitForEvent("page"),
+      linkedinIcon.click(),
+    ]);
+
+    await newPage.waitForLoadState();
+    page = newPage;
+  });
+  await test.step("Step 6: Verify navigation to Linkedin page", async () => {
+    await expect(page).toHaveURL(/linkedin\.com\/company\/sauce-labs/);
+    await expect(page.locator("text=Sauce Labs").first()).toBeVisible();
+  });
+});
+
+
+import { test, expect } from "@playwright/test";
+import { project05_HelperClass_pt03 } from "../pages/project05_HelperClass_pt03";
+
+let prj05_pt03;
+test.beforeEach(async ({ page }) => {
+  prj05_pt03 = new project05_HelperClass_pt03(page);
+});
+
+const productLocatorList = [
+  "#add-to-cart-sauce-labs-backpack",
+  "#add-to-cart-sauce-labs-bike-light",
+  "#add-to-cart-sauce-labs-bolt-t-shirt",
+  "#add-to-cart-sauce-labs-fleece-jacket",
+  "#add-to-cart-sauce-labs-onesie",
+  '[data-test="add-to-cart-test.allthethings()-t-shirt-(red)"]',
+];
+
+const productLocatorPriceMap = [
+  "$29.99",
+  "$9.99",
+  "$15.99",
+  "$49.99",
+  "$7.99",
+  "$15.99",
+];
+
+const removeBtnLocatorList = [
+  '[data-test="remove-sauce-labs-backpack"]',
+  '[data-test="remove-sauce-labs-bike-light"]',
+  '[data-test="remove-sauce-labs-bolt-t-shirt"]',
+  '[data-test="remove-sauce-labs-fleece-jacket"]',
+  '[data-test="remove-sauce-labs-onesie"]',
+  '[data-test="remove-test.allthethings()-t-shirt-(red)"]',
+];
+
+test('TC024 - Verify E2E flow when user purchase the "Sauce Labs Backpack" item', async ({
+  page,
+}) => {
+  // User navigate to the Swags lab website
+  const logoLocator = page.locator(".login_logo");
+  await prj05_pt03.navigateWebPage(logoLocator);
+
+  // User fills up the ID and password
+  const userName = "standard_user";
+  const userPwd = "secret_sauce";
+  await prj05_pt03.fillUpCorrectPassword(userName, userPwd);
+
+  // User add the cart item and validate the pricing
+  const product = "Sauce Labs Backpack";
+  const prdLocator = productLocatorList[0];
+  const price = productLocatorPriceMap[0];
+  await prj05_pt03.addCartItems(product, prdLocator, price);
+
+  // User clicks the checkout button and fill up the customer checkout information page
+  const clientFirstName = prj05_pt03.getRandomClient();
+  const clientLastName = prj05_pt03.getRandomClient();
+  await prj05_pt03.fillCheckOutPage(clientFirstName, clientLastName);
+
+  // Verify the checkout information page and purchase the item
+  await prj05_pt03.verifyCheckOutPageAndPurchase(product, price);
+});
+
+test('TC025 - Verify E2E flow when user purchase the "Sauce Labs Bike Light" item', async ({
+  page,
+}) => {
+  // User navigate to the Swags lab website
+  const logoLocator = page.locator(".login_logo");
+  await prj05_pt03.navigateWebPage(logoLocator);
+
+  // User fills up the ID and password
+  const userName = "standard_user";
+  const userPwd = "secret_sauce";
+  await prj05_pt03.fillUpCorrectPassword(userName, userPwd);
+
+  // User add the cart item and validate the pricing
+  const product = "Sauce Labs Bike Light";
+  const prdLocator = productLocatorList[1];
+  const price = productLocatorPriceMap[1];
+  await prj05_pt03.addCartItems(product, prdLocator, price);
+
+  // User clicks the checkout button and fill up the customer checkout information page
+  const clientFirstName = prj05_pt03.getRandomClient();
+  const clientLastName = prj05_pt03.getRandomClient();
+  await prj05_pt03.fillCheckOutPage(clientFirstName, clientLastName);
+
+  // Verify the checkout information page and purchase the item
+  await prj05_pt03.verifyCheckOutPageAndPurchase(product, price);
+});
+
+test('TC026 - Verify E2E flow when user purchase the "Sauce Labs Bolt T-Shirt', async ({
+  page,
+}) => {
+  // User navigate to the Swags lab website
+  const logoLocator = page.locator(".login_logo");
+  await prj05_pt03.navigateWebPage(logoLocator);
+
+  // User fills up the ID and password
+  const userName = "standard_user";
+  const userPwd = "secret_sauce";
+  await prj05_pt03.fillUpCorrectPassword(userName, userPwd);
+
+  // User add the cart item and validate the pricing
+  const product = "Sauce Labs Bolt T-Shirt";
+  const prdLocator = productLocatorList[2];
+  const price = productLocatorPriceMap[2];
+  await prj05_pt03.addCartItems(product, prdLocator, price);
+
+  // User clicks the checkout button and fill up the customer checkout information page
+  const clientFirstName = prj05_pt03.getRandomClient();
+  const clientLastName = prj05_pt03.getRandomClient();
+  await prj05_pt03.fillCheckOutPage(clientFirstName, clientLastName);
+
+  // Verify the checkout information page and purchase the item
+  await prj05_pt03.verifyCheckOutPageAndPurchase(product, price);
+});
+
+test('TC027 - Verify E2E flow when user purchase the "Sauce Labs Fleece Jacket', async ({
+  page,
+}) => {
+  // User navigate to the Swags lab website
+  const logoLocator = page.locator(".login_logo");
+  await prj05_pt03.navigateWebPage(logoLocator);
+
+  // User fills up the ID and password
+  const userName = "standard_user";
+  const userPwd = "secret_sauce";
+  await prj05_pt03.fillUpCorrectPassword(userName, userPwd);
+
+  // User add the cart item and validate the pricing
+  const product = "Sauce Labs Fleece Jacket";
+  const prdLocator = productLocatorList[3];
+  const price = productLocatorPriceMap[3];
+  await prj05_pt03.addCartItems(product, prdLocator, price);
+
+  // User clicks the checkout button and fill up the customer checkout information page
+  const clientFirstName = prj05_pt03.getRandomClient();
+  const clientLastName = prj05_pt03.getRandomClient();
+  await prj05_pt03.fillCheckOutPage(clientFirstName, clientLastName);
+
+  // Verify the checkout information page and purchase the item
+  await prj05_pt03.verifyCheckOutPageAndPurchase(product, price);
+});
+
+test('TC028 - Verify E2E flow when user purchase the "Sauce Labs Onesie', async ({
+  page,
+}) => {
+  // User navigate to the Swags lab website
+  const logoLocator = page.locator(".login_logo");
+  await prj05_pt03.navigateWebPage(logoLocator);
+
+  // User fills up the ID and password
+  const userName = "standard_user";
+  const userPwd = "secret_sauce";
+  await prj05_pt03.fillUpCorrectPassword(userName, userPwd);
+
+  // User add the cart item and validate the pricing
+  const product = "Sauce Labs Onesie";
+  const prdLocator = productLocatorList[4];
+  const price = productLocatorPriceMap[4];
+  await prj05_pt03.addCartItems(product, prdLocator, price);
+
+  // User clicks the checkout button and fill up the customer checkout information page
+  const clientFirstName = prj05_pt03.getRandomClient();
+  const clientLastName = prj05_pt03.getRandomClient();
+  await prj05_pt03.fillCheckOutPage(clientFirstName, clientLastName);
+
+  // Verify the checkout information page and purchase the item
+  await prj05_pt03.verifyCheckOutPageAndPurchase(product, price);
+});
+
+test('TC029 - Verify E2E flow when user purchase the "Test.allTheThings() T-Shirt (Red)', async ({
+  page,
+}) => {
+  // User navigate to the Swags lab website
+  const logoLocator = page.locator(".login_logo");
+  await prj05_pt03.navigateWebPage(logoLocator);
+
+  // User fills up the ID and password
+  const userName = "standard_user";
+  const userPwd = "secret_sauce";
+  await prj05_pt03.fillUpCorrectPassword(userName, userPwd);
+
+  // User add the cart item and validate the pricing
+  const product = "Test.allTheThings() T-Shirt (Red)";
+  const prdLocator = productLocatorList[5];
+  const price = productLocatorPriceMap[5];
+  await prj05_pt03.addCartItems(product, prdLocator, price);
+
+  // User clicks the checkout button and fill up the customer checkout information page
+  const clientFirstName = prj05_pt03.getRandomClient();
+  const clientLastName = prj05_pt03.getRandomClient();
+  await prj05_pt03.fillCheckOutPage(clientFirstName, clientLastName);
+
+  // Verify the checkout information page and purchase the item
+  await prj05_pt03.verifyCheckOutPageAndPurchase(product, price);
+});
+
+// playwright config.js
+// @ts-check
+import { defineConfig, devices } from "@playwright/test";
+
+/**
+ * Read environment variables from file.
+ * https://github.com/motdotla/dotenv
+ */
+// import dotenv from 'dotenv';
+// import path from 'path';
+// dotenv.config({ path: path.resolve(__dirname, '.env') });
+
+/**
+ * @see https://playwright.dev/docs/test-configuration
+ */
+export default defineConfig({
+  testDir: "./tests",
+  /* Run tests in files in parallel */
+  fullyParallel: true,
+  /* Fail the build on CI if you accidentally left test.only in the source code. */
+  forbidOnly: !!process.env.CI,
+  /* Retry on CI only */
+  retries: process.env.CI ? 2 : 0,
+  /* Opt out of parallel tests on CI. */
+  workers: process.env.CI ? 1 : undefined,
+  /* Reporter to use. See https://playwright.dev/docs/test-reporters */
+  reporter: [["list"], ["html"], ["allure-playwright"]],
+  /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
+
+  use: {
+    headless: true,
+    screenshot: "on",
+    video: "on",
+    trace: "on",
+  },
+
+  /* Configure projects for major browsers */
+  projects: [
+    {
+      name: "chromium",
+      use: { ...devices["Desktop Chrome"] },
+    },
+
+    /* Test against mobile viewports. */
+    // {
+    //   name: 'Mobile Chrome',
+    //   use: { ...devices['Pixel 5'] },
+    // },
+    // {
+    //   name: 'Mobile Safari',
+    //   use: { ...devices['iPhone 12'] },
+    // },
+
+    /* Test against branded browsers. */
+    // {
+    //   name: 'Microsoft Edge',
+    //   use: { ...devices['Desktop Edge'], channel: 'msedge' },
+    // },
+    // {
+    //   name: 'Google Chrome',
+    //   use: { ...devices['Desktop Chrome'], channel: 'chrome' },
+    // },
+  ],
+
+  /* Run your local dev server before starting the tests */
+  // webServer: {
+  //   command: 'npm run start',
+  //   url: 'http://localhost:3000',
+  //   reuseExistingServer: !process.env.CI,
+  // },
+});
